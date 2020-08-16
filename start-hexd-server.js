@@ -10,5 +10,5 @@ app.use(express.static('./src'));
 
 app.listen(LOCAL_PORT, () => {
   console.log(`started hexd at at http://localhost:${LOCAL_PORT} - opening`);
-  openurl.open(`http://localhost:${LOCAL_PORT}`);
+  openurl.open(`http://localhost:${LOCAL_PORT}/hexd.html`);
 })
