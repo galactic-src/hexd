@@ -4,10 +4,10 @@
 <script>
 
 function draw() {
-  var canvas = document.getElementById('canvas');
+  const canvas = document.getElementById('canvas');
   canvas.width = this.width;
   canvas.height = this.height;
-  var ctx = canvas.getContext('2d');
+  const ctx = canvas.getContext('2d');
   ctx.drawImage(this, 0,0);
 }
 
@@ -68,19 +68,20 @@ function redraw() {
 }
 
 function onFileSelected(evt) {
-  let oldImg = getImage();
+  const oldImg = getImage();
   if (oldImg !== null) {
     document.body.removeChild(oldImg);
   }
 
-  let img = document.createElement('img');
+  const selectedFile = event.target.files[0];
+
+  const img = document.createElement('img');
   img.id = 'hiddenImage';
   img.origin = 'anonymous';
-  const selectedFile = event.target.files[0];
   img.src = URL.createObjectURL(selectedFile);
   img.style = "position:absolute; top: -9999px; left: -9999px;";
   img.onload = function() {
-    let ctx = getCanvasContext();
+    const ctx = getCanvasContext();
     ctx.canvas.width = this.naturalWidth;
     ctx.canvas.height = this.naturalHeight;
 
@@ -99,10 +100,10 @@ function copyImageToCanvas(ctx) {
 }
 
 function setDefaultHex(ctx) {
-  let ratio = ctx.canvas.height / ctx.canvas.width;
-  let edge = (ratio > Math.sqrt(4/3)) ? ctx.canvas.width / Math.sqrt(3) : ctx.canvas.height / 2;
-  let xOffset = (ctx.canvas.width / 2) - edge * Math.sqrt(3/4);
-  let yOffset = (ctx.canvas.height / 2) - edge;
+  const ratio = ctx.canvas.height / ctx.canvas.width;
+  const edge = (ratio > Math.sqrt(4/3)) ? ctx.canvas.width / Math.sqrt(3) : ctx.canvas.height / 2;
+  const xOffset = (ctx.canvas.width / 2) - edge * Math.sqrt(3/4);
+  const yOffset = (ctx.canvas.height / 2) - edge;
 
   setEdgeLength(edge);
   document.getElementById("x").value = xOffset;
@@ -137,15 +138,7 @@ function cropHex(ctx) {
   const hexWidth = edge * Math.sqrt(3);
 	const hexRight = hexLeft + hexWidth;
   const hexMiddle = hexLeft + hexWidth/2;
-/*
-  console.log(`edge ${edge}`);
-  console.log(`hexLeft ${hexLeft}`);
-  console.log(`hexTop ${hexTop}`);
-  console.log(`hexHeight ${hexHeight}`);
-  console.log(`hexBottom ${hexBottom}`);
-  console.log(`hexWidth ${hexWidth}`);
-  console.log(`hexRight ${hexRight}`);
-*/
+
 	resetCtx(ctx);
   ctx.globalCompositeOperation = 'destination-out';
 
@@ -209,8 +202,7 @@ function handleDownload(exporter) {
   canvas.getContext('2d')
     .drawImage(document.getElementById('output'), getXOffset(), getYOffset(), hexWidth, hexHeight, 0, 0, hexWidth, hexHeight);
 
-  var dataUrl = canvas.toDataURL('image/png');
-  exporter.href = dataUrl;
+  exporter.href = canvas.toDataURL('image/png');
 }
 
 </script>
