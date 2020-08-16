@@ -38,15 +38,16 @@ function onYChanged(newYOffset) {
   if (newYOffset < 0) {
     setYOffset(0)
     setEdgeLength(getEdgeLength() - 1);
-  }
-  const canvasHeight = getCanvasHeight();
-  const edgeLength = getEdgeLength();
-  const hexHeight = edgeLength * 2;
-  const newHexBottom = newYOffset + hexHeight;
+  } else {
+    const canvasHeight = getCanvasHeight();
+    const edgeLength = getEdgeLength();
+    const hexHeight = edgeLength * 2;
+    const newHexBottom = newYOffset + hexHeight;
 
-  if (newHexBottom > canvasHeight) {
-    const newEdge = (canvasHeight - newYOffset) / 2;
-    setEdgeLength(newEdge);
+    if (newHexBottom > canvasHeight) {
+      const newEdge = (canvasHeight - newYOffset) / 2;
+      setEdgeLength(newEdge);
+    }
   }
 
   redraw();
