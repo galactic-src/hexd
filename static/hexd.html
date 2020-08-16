@@ -1,0 +1,226 @@
+<html>
+<head>
+
+<script>
+
+function draw() {
+  var canvas = document.getElementById('canvas');
+  canvas.width = this.width;
+  canvas.height = this.height;
+  var ctx = canvas.getContext('2d');
+  ctx.drawImage(this, 0,0);
+}
+
+const getEdgeLength = () => document.getElementById('edge').value * 1;
+const setEdgeLength = (edgeLength) => { document.getElementById('edge').value = edgeLength; }
+const getCanvasContext = () => document.getElementById('output').getContext("2d");
+const getCanvasHeight = () => document.getElementById('output').height * 1;
+const getCanvasWidth = () => document.getElementById('output').width * 1;
+const getXOffset = () => document.getElementById('x').value * 1;
+const setXOffset = (xOffset) => document.getElementById('x').value = xOffset;
+const getYOffset = () => document.getElementById('y').value * 1;
+const setYOffset = (yOffset) => document.getElementById('y').value = yOffset;
+const getImage = () => document.getElementById('hiddenImage');
+
+function onXChanged(newXOffset) {
+  if (newXOffset < 0) {
+    setXOffset(0);
+    setEdgeLength(getEdgeLength() - 1);
+  } else {
+    const canvasWidth = getCanvasWidth();
+    const edgeLength = getEdgeLength();
+    const hexWidth = edgeLength * Math.sqrt(3);
+    const newHexRight = newXOffset + hexWidth; 
+
+    if (newHexRight > canvasWidth) {
+      const newEdge = (canvasWidth - newXOffset) / Math.sqrt(3);
+      setEdgeLength(newEdge);
+    }
+  }
+
+  redraw();
+}
+
+function onYChanged(newYOffset) {
+  console.log(newYOffset);
+  if (newYOffset < 0) {
+    setYOffset(0)
+    setEdgeLength(getEdgeLength() - 1);
+  }
+  const canvasHeight = getCanvasHeight();
+  const edgeLength = getEdgeLength();
+  const hexHeight = edgeLength * 2;
+  const newHexBottom = newYOffset + hexHeight;
+
+  if (newHexBottom > canvasHeight) {
+    const newEdge = (canvasHeight - newYOffset) / 2;
+    setEdgeLength(newEdge);
+  }
+
+  redraw();
+}
+
+function redraw() {
+  const ctx = getCanvasContext();
+  copyImageToCanvas(ctx);
+  cropHex(ctx);
+  //drawHexOutline(ctx);
+}
+
+function onFileSelected(evt) {
+  let oldImg = getImage();
+  if (oldImg !== null) {
+    document.body.removeChild(oldImg);
+  }
+
+  let img = document.createElement('img');
+  img.id = 'hiddenImage';
+  img.origin = 'anonymous';
+  const selectedFile = event.target.files[0];
+  img.src = URL.createObjectURL(selectedFile);
+  img.style = "position:absolute; top: -9999px; left: -9999px;";
+  img.onload = function() {
+    let ctx = getCanvasContext();
+    ctx.canvas.width = this.naturalWidth;
+    ctx.canvas.height = this.naturalHeight;
+
+    setDefaultHex(ctx);
+
+		redraw();
+  };
+
+  document.body.appendChild(img);
+}
+
+function copyImageToCanvas(ctx) {
+  resetCtx(ctx);
+  ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+  ctx.drawImage(getImage(), 0, 0);
+}
+
+function setDefaultHex(ctx) {
+  let ratio = ctx.canvas.height / ctx.canvas.width;
+  let edge = (ratio > Math.sqrt(4/3)) ? ctx.canvas.width / Math.sqrt(3) : ctx.canvas.height / 2;
+  let xOffset = (ctx.canvas.width / 2) - edge * Math.sqrt(3/4);
+  let yOffset = (ctx.canvas.height / 2) - edge;
+
+  setEdgeLength(edge);
+  document.getElementById("x").value = xOffset;
+  document.getElementById("y").value = yOffset;
+}
+
+function drawHexOutline(ctx) {
+  const xOffset = getXOffset();
+  const yOffset = getYOffset();
+  const edge = getEdgeLength();
+
+  resetCtx(ctx);
+  ctx.beginPath();
+	ctx.moveTo(xOffset, yOffset + edge * 0.5);
+	ctx.lineTo(xOffset, yOffset + edge * 1.5);
+	ctx.lineTo(xOffset + edge * Math.sqrt(3/4), yOffset + edge * 2);
+	ctx.lineTo(xOffset + edge * Math.sqrt(3), yOffset + edge * 1.5);
+	ctx.lineTo(xOffset + edge * Math.sqrt(3), yOffset + edge * 0.5);
+	ctx.lineTo(xOffset + edge * Math.sqrt(3/4), yOffset);
+	ctx.lineTo(xOffset, yOffset + edge * 0.5);
+	ctx.stroke();
+}
+
+function cropHex(ctx) {
+  const edge = getEdgeLength();
+  const hexLeft = getXOffset();
+  const hexTop = getYOffset();
+
+  const hexHeight = edge * 2;
+  const hexBottom = hexTop + hexHeight; 
+
+  const hexWidth = edge * Math.sqrt(3);
+	const hexRight = hexLeft + hexWidth;
+  const hexMiddle = hexLeft + hexWidth/2;
+/*
+  console.log(`edge ${edge}`);
+  console.log(`hexLeft ${hexLeft}`);
+  console.log(`hexTop ${hexTop}`);
+  console.log(`hexHeight ${hexHeight}`);
+  console.log(`hexBottom ${hexBottom}`);
+  console.log(`hexWidth ${hexWidth}`);
+  console.log(`hexRight ${hexRight}`);
+*/
+	resetCtx(ctx);
+  ctx.globalCompositeOperation = 'destination-out';
+
+  if (hexTop > 0) {
+    ctx.fillRect(0, 0, ctx.canvas.width, hexTop);
+  }
+  if (hexBottom < ctx.canvas.height) {
+    ctx.fillRect(0, hexBottom, ctx.canvas.width, ctx.canvas.height - hexBottom);
+  }
+  if (hexLeft > 0) {
+    ctx.fillRect(0, hexTop, hexLeft + 1, hexHeight);
+  }
+  if (hexRight < ctx.canvas.width) {
+    ctx.fillRect(hexRight - 1, hexTop, ctx.canvas.width - hexRight + 2, hexHeight);
+  }
+
+  ctx.beginPath();
+  ctx.moveTo(hexLeft, hexTop)
+	ctx.lineTo(hexLeft, hexTop + edge * 0.5);
+	ctx.lineTo(hexMiddle, hexTop);
+	ctx.lineTo(hexLeft, hexTop);
+  ctx.fill();
+
+  ctx.beginPath();
+  ctx.moveTo(hexMiddle, hexTop);
+	ctx.lineTo(hexRight, hexTop + edge * 0.5);
+	ctx.lineTo(hexRight, hexTop);
+  ctx.lineTo(hexMiddle, hexTop);
+  ctx.fill();
+
+  ctx.beginPath();
+  ctx.moveTo(hexLeft, hexBottom);
+	ctx.lineTo(hexLeft, hexBottom - edge * 0.5);
+	ctx.lineTo(hexMiddle, hexBottom);
+  ctx.lineTo(hexLeft, hexBottom);
+  ctx.fill();
+
+  ctx.beginPath();
+  ctx.moveTo(hexMiddle, hexBottom);
+	ctx.lineTo(hexRight, hexBottom - edge * 0.5);
+	ctx.lineTo(hexRight, hexBottom);
+  ctx.lineTo(hexMiddle, hexBottom);
+  ctx.fill();
+}
+
+function resetCtx(ctx) {
+  ctx.globalAlpha = 1.0;
+  ctx.globalCompositeOperation = 'source-over';
+  ctx.lineWidth = 3;
+  ctx.strokeStyle = "#FFFFFF";
+}
+
+function handleDownload(exporter) {
+  const edge = getEdgeLength();
+  const hexWidth = edge * Math.sqrt(3);
+  const hexHeight = edge * 2;
+
+  const canvas = document.createElement('canvas');
+  canvas.width  = hexWidth;
+  canvas.height = hexHeight;
+  canvas.getContext('2d')
+    .drawImage(document.getElementById('output'), getXOffset(), getYOffset(), hexWidth, hexHeight, 0, 0, hexWidth, hexHeight);
+
+  var dataUrl = canvas.toDataURL('image/png');
+  exporter.href = dataUrl;
+}
+
+</script>
+</head>
+<body>
+<div><input type="file" onchange="onFileSelected(event)"></div>
+<div>x offset: <input type="number" id="x" oninput="onXChanged(this.value * 1)"/></div>
+<div>y offset: <input type="number" id="y" oninput="onYChanged(this.value * 1)"/></div>
+<div>edge: <input type="number" id="edge" oninput="redraw()"/><div>
+<div><canvas id="output" height = "0" width = "0" ></canvas></div>
+<div><a id="export" download="hexport.png" onclick="handleDownload(this)">Export</a></div>
+</body>
+</html>
