@@ -9,9 +9,9 @@ You will need npm and node installed.
 ## Usage
 
 ```
-npm install && npm start
+npm i && npm start
 ```
-Then visit `localhost:3000/hexd.html`.
+This should automatically open `localhost:3000/hexd.html` in your default browser.
 
 
 ## Why bother with an express server?
