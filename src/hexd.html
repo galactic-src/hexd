@@ -3,14 +3,6 @@
 
 <script>
 
-function draw() {
-  const canvas = document.getElementById('canvas');
-  canvas.width = this.width;
-  canvas.height = this.height;
-  const ctx = canvas.getContext('2d');
-  ctx.drawImage(this, 0,0);
-}
-
 const getEdgeLength = () => document.getElementById('edge').value * 1;
 const setEdgeLength = (edgeLength) => { document.getElementById('edge').value = edgeLength; }
 const getCanvasContext = () => document.getElementById('output').getContext("2d");
@@ -68,12 +60,15 @@ function redraw() {
 }
 
 function onFileSelected(evt) {
+  const selectedFile = event.target.files[0];
+  if (selectedFile === undefined) {
+    return;
+  }
+
   const oldImg = getImage();
   if (oldImg !== null) {
     document.body.removeChild(oldImg);
   }
-
-  const selectedFile = event.target.files[0];
 
   const img = document.createElement('img');
   img.id = 'hiddenImage';
@@ -149,38 +144,37 @@ function cropHex(ctx) {
     ctx.fillRect(0, hexBottom, ctx.canvas.width, ctx.canvas.height - hexBottom);
   }
   if (hexLeft > 0) {
-    ctx.fillRect(0, hexTop, hexLeft + 1, hexHeight);
+    ctx.fillRect(0, hexTop, hexLeft, hexHeight);
   }
   if (hexRight < ctx.canvas.width) {
-    ctx.fillRect(hexRight - 1, hexTop, ctx.canvas.width - hexRight + 2, hexHeight);
+    ctx.fillRect(hexRight, hexTop, ctx.canvas.width - hexRight, hexHeight);
   }
 
+  const clipTop = Math.max(hexTop-1, 0);
+  const clipBottom = Math.min(hexBottom+1, ctx.canvas.height);
+  const clipLeft = Math.max(hexLeft-1, 0);
+  const clipRight = Math.min(hexRight+1, ctx.canvas.width);
+
   ctx.beginPath();
-  ctx.moveTo(hexLeft, hexTop)
+  ctx.moveTo(clipLeft, clipTop);
+	ctx.lineTo(clipLeft, hexTop + edge * 0.5 + 1);
 	ctx.lineTo(hexLeft, hexTop + edge * 0.5);
 	ctx.lineTo(hexMiddle, hexTop);
-	ctx.lineTo(hexLeft, hexTop);
-  ctx.fill();
-
-  ctx.beginPath();
-  ctx.moveTo(hexMiddle, hexTop);
 	ctx.lineTo(hexRight, hexTop + edge * 0.5);
-	ctx.lineTo(hexRight, hexTop);
-  ctx.lineTo(hexMiddle, hexTop);
+	ctx.lineTo(clipRight, hexTop + edge * 0.5 + 1);
+  ctx.lineTo(clipRight, clipTop);
+  ctx.closePath();
   ctx.fill();
 
   ctx.beginPath();
-  ctx.moveTo(hexLeft, hexBottom);
+  ctx.moveTo(clipLeft, clipBottom);
+	ctx.lineTo(clipLeft, hexBottom - edge * 0.5 - 1);
 	ctx.lineTo(hexLeft, hexBottom - edge * 0.5);
 	ctx.lineTo(hexMiddle, hexBottom);
-  ctx.lineTo(hexLeft, hexBottom);
-  ctx.fill();
-
-  ctx.beginPath();
-  ctx.moveTo(hexMiddle, hexBottom);
 	ctx.lineTo(hexRight, hexBottom - edge * 0.5);
-	ctx.lineTo(hexRight, hexBottom);
-  ctx.lineTo(hexMiddle, hexBottom);
+	ctx.lineTo(clipRight, hexBottom - edge * 0.5 - 1);
+  ctx.lineTo(clipRight, clipBottom);
+  ctx.closePath();
   ctx.fill();
 }
 
@@ -212,7 +206,7 @@ function handleDownload(exporter) {
 <div>x offset: <input type="number" id="x" oninput="onXChanged(this.value * 1)"/></div>
 <div>y offset: <input type="number" id="y" oninput="onYChanged(this.value * 1)"/></div>
 <div>edge: <input type="number" id="edge" oninput="redraw()"/><div>
-<div><canvas id="output" height = "0" width = "0" ></canvas></div>
+<div><canvas id="output" height = "0" width = "0" style="border: 2px solid blueviolet"></canvas></div>
 <div><a id="export" download="hexport.png" onclick="handleDownload(this)">Export</a></div>
 </body>
 </html>
