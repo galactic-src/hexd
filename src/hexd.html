@@ -3,7 +3,11 @@
 
 <script>
 
+const SQRT3 = Math.sqrt(3);
 const rounded = (scalar) => Math.round(scalar*100)/100;
+
+const calcHexHeight = (edgeLength) => edgeLength * 2;
+const calcHexWidth = (edgeLength) => edgeLength * SQRT3;
 
 const getEdgeLength = () => document.getElementById('edge').value * 1;
 const setEdgeLength = (edgeLength) => document.getElementById('edge').value = rounded(edgeLength);
@@ -23,11 +27,11 @@ function onXChanged(newXOffset) {
   } else {
     const canvasWidth = getCanvasWidth();
     const edgeLength = getEdgeLength();
-    const hexWidth = edgeLength * Math.sqrt(3);
+    const hexWidth = calcHexWidth(edgeLength);
     const newHexRight = newXOffset + hexWidth; 
 
     if (newHexRight > canvasWidth) {
-      const newEdge = (canvasWidth - newXOffset) / Math.sqrt(3);
+      const newEdge = (canvasWidth - newXOffset) / SQRT3;
       setEdgeLength(newEdge);
     }
   }
@@ -42,7 +46,7 @@ function onYChanged(newYOffset) {
   } else {
     const canvasHeight = getCanvasHeight();
     const edgeLength = getEdgeLength();
-    const hexHeight = edgeLength * 2;
+    const hexHeight = calcHexHeight(edgeLength);
     const newHexBottom = newYOffset + hexHeight;
 
     if (newHexBottom > canvasHeight) {
@@ -59,12 +63,12 @@ function onEdgeChanged(newEdge) {
   const canvasWidth = getCanvasWidth();
 
   let cappedEdge = newEdge;
-  if (newEdge * 2 > canvasHeight) {
+  if (calcHexHeight(newEdge) > canvasHeight) {
     cappedEdge = canvasHeight/2;
   }
 
-  if (cappedEdge * Math.sqrt(3) > canvasWidth) {
-    cappedEdge = canvasWidth/Math.sqrt(3);
+  if (calcHexWidth(cappedEdge) > canvasWidth) {
+    cappedEdge = canvasWidth/SQRT3;
   }
 
   if (cappedEdge !== newEdge) {
@@ -72,13 +76,13 @@ function onEdgeChanged(newEdge) {
   }
 
   const xOffset = getXOffset();
-  const hexWidth = cappedEdge * Math.sqrt(3);
+  const hexWidth = calcHexWidth(cappedEdge);
   if (xOffset + hexWidth > canvasWidth) {
     setXOffset(canvasWidth - hexWidth);
   }
 
   const yOffset = getYOffset();
-  const hexHeight = cappedEdge * 2;
+  const hexHeight = calcHexHeight(cappedEdge);
   if (yOffset + hexHeight > canvasHeight) {
     setYOffset(canvasHeight - hexHeight);
   }
@@ -131,11 +135,11 @@ function copyImageToCanvas(ctx) {
 function setDefaultHex(ctx) {
   const ratio = ctx.canvas.height / ctx.canvas.width;
 
-  const lengthFromWidth = ctx.canvas.width / Math.sqrt(3);
+  const lengthFromWidth = ctx.canvas.width / SQRT3;
   const lengthFromHeight = ctx.canvas.height / 2;
   const edge = Math.min(lengthFromWidth, lengthFromHeight);
-  const xOffset = (ctx.canvas.width / 2) - edge * Math.sqrt(3/4);
-  const yOffset = (ctx.canvas.height / 2) - edge;
+  const xOffset = (ctx.canvas.width / 2) - calcHexWidth(edge) / 2;
+  const yOffset = (ctx.canvas.height / 2) - calcHexHeight(edge) / 2;
 
   setEdgeLength(edge);
   setXOffset(xOffset);
@@ -151,10 +155,10 @@ function drawHexOutline(ctx) {
   ctx.beginPath();
 	ctx.moveTo(xOffset, yOffset + edge * 0.5);
 	ctx.lineTo(xOffset, yOffset + edge * 1.5);
-	ctx.lineTo(xOffset + edge * Math.sqrt(3/4), yOffset + edge * 2);
-	ctx.lineTo(xOffset + edge * Math.sqrt(3), yOffset + edge * 1.5);
-	ctx.lineTo(xOffset + edge * Math.sqrt(3), yOffset + edge * 0.5);
-	ctx.lineTo(xOffset + edge * Math.sqrt(3/4), yOffset);
+	ctx.lineTo(xOffset + calcHexWidth(edge) / 2, yOffset + calcHexHeight(edge));
+	ctx.lineTo(xOffset + calcHexWidth(edge), yOffset + edge * 1.5);
+	ctx.lineTo(xOffset + calcHexWidth(edge), yOffset + edge * 0.5);
+	ctx.lineTo(xOffset + calcHexWidth(edge) / 2, yOffset);
 	ctx.lineTo(xOffset, yOffset + edge * 0.5);
 	ctx.stroke();
 }
@@ -164,15 +168,22 @@ function cropHex(ctx) {
   const hexLeft = getXOffset();
   const hexTop = getYOffset();
 
-  const hexHeight = edge * 2;
+  const hexHeight = calcHexHeight(edge);
   const hexBottom = hexTop + hexHeight; 
 
-  const hexWidth = edge * Math.sqrt(3);
+  const hexWidth = calcHexWidth(edge);
 	const hexRight = hexLeft + hexWidth;
   const hexMiddle = hexLeft + hexWidth/2;
 
 	resetCtx(ctx);
   ctx.globalCompositeOperation = 'destination-out';
+
+  const clipTop = Math.max(hexTop-1, 0);
+  const clipBottom = Math.min(hexBottom+1, ctx.canvas.height);
+  const clipHeight = clipBottom - clipTop;
+  const clipLeft = Math.max(hexLeft-1, 0);
+  const clipRight = Math.min(hexRight+1, ctx.canvas.width);
+  const clipWidth = clipRight - clipLeft;
 
   if (hexTop > 0) {
     ctx.fillRect(0, 0, ctx.canvas.width, hexTop);
@@ -181,16 +192,11 @@ function cropHex(ctx) {
     ctx.fillRect(0, hexBottom, ctx.canvas.width, ctx.canvas.height - hexBottom);
   }
   if (hexLeft > 0) {
-    ctx.fillRect(0, hexTop, hexLeft, hexHeight);
+    ctx.fillRect(0, clipTop, hexLeft, clipHeight);
   }
   if (hexRight < ctx.canvas.width) {
-    ctx.fillRect(hexRight, hexTop, ctx.canvas.width - hexRight, hexHeight);
+    ctx.fillRect(hexRight, clipTop, ctx.canvas.width - hexRight, clipHeight);
   }
-
-  const clipTop = Math.max(hexTop-1, 0);
-  const clipBottom = Math.min(hexBottom+1, ctx.canvas.height);
-  const clipLeft = Math.max(hexLeft-1, 0);
-  const clipRight = Math.min(hexRight+1, ctx.canvas.width);
 
   ctx.beginPath();
   ctx.moveTo(clipLeft, clipTop);
@@ -224,8 +230,8 @@ function resetCtx(ctx) {
 
 function handleDownload(exporter) {
   const edge = getEdgeLength();
-  const hexWidth = edge * Math.sqrt(3);
-  const hexHeight = edge * 2;
+  const hexWidth = calcHexWidth(edge);
+  const hexHeight = calcHexHeight(edge);
 
   const canvas = document.createElement('canvas');
   canvas.width  = hexWidth;
