@@ -36,7 +36,6 @@ function onXChanged(newXOffset) {
 }
 
 function onYChanged(newYOffset) {
-  console.log(newYOffset);
   if (newYOffset < 0) {
     setYOffset(0)
     setEdgeLength(getEdgeLength() - 1);
@@ -50,6 +49,38 @@ function onYChanged(newYOffset) {
       const newEdge = (canvasHeight - newYOffset) / 2;
       setEdgeLength(newEdge);
     }
+  }
+
+  redraw();
+}
+
+function onEdgeChanged(newEdge) {
+  const canvasHeight = getCanvasHeight();
+  const canvasWidth = getCanvasWidth();
+
+  let cappedEdge = newEdge;
+  if (newEdge * 2 > canvasHeight) {
+    cappedEdge = canvasHeight/2;
+  }
+
+  if (cappedEdge * Math.sqrt(3) > canvasWidth) {
+    cappedEdge = canvasWidth/Math.sqrt(3);
+  }
+
+  if (cappedEdge !== newEdge) {
+    setEdgeLength(cappedEdge);
+  }
+
+  const xOffset = getXOffset();
+  const hexWidth = cappedEdge * Math.sqrt(3);
+  if (xOffset + hexWidth > canvasWidth) {
+    setXOffset(canvasWidth - hexWidth);
+  }
+
+  const yOffset = getYOffset();
+  const hexHeight = cappedEdge * 2;
+  if (yOffset + hexHeight > canvasHeight) {
+    setYOffset(canvasHeight - hexHeight);
   }
 
   redraw();
@@ -211,7 +242,7 @@ function handleDownload(exporter) {
 <div><input type="file" onchange="onFileSelected(event)"></div>
 <div>x offset: <input type="number" id="x" oninput="onXChanged(this.value * 1)"/></div>
 <div>y offset: <input type="number" id="y" oninput="onYChanged(this.value * 1)"/></div>
-<div>edge: <input type="number" id="edge" oninput="redraw()"/><div>
+<div>edge: <input type="number" id="edge" oninput="onEdgeChanged(this.value * 1)"/><div>
 <div><canvas id="output" height = "0" width = "0" style="border: 2px solid blueviolet"></canvas></div>
 <div><a id="export" download="hexport.png" onclick="handleDownload(this)">Export</a></div>
 </body>
