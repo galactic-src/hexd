@@ -3,15 +3,17 @@
 
 <script>
 
+const rounded = (scalar) => Math.round(scalar*100)/100;
+
 const getEdgeLength = () => document.getElementById('edge').value * 1;
-const setEdgeLength = (edgeLength) => { document.getElementById('edge').value = edgeLength; }
+const setEdgeLength = (edgeLength) => document.getElementById('edge').value = rounded(edgeLength);
 const getCanvasContext = () => document.getElementById('output').getContext("2d");
 const getCanvasHeight = () => document.getElementById('output').height * 1;
 const getCanvasWidth = () => document.getElementById('output').width * 1;
 const getXOffset = () => document.getElementById('x').value * 1;
-const setXOffset = (xOffset) => document.getElementById('x').value = xOffset;
+const setXOffset = (xOffset) => document.getElementById('x').value = rounded(xOffset);
 const getYOffset = () => document.getElementById('y').value * 1;
-const setYOffset = (yOffset) => document.getElementById('y').value = yOffset;
+const setYOffset = (yOffset) => document.getElementById('y').value = rounded(yOffset);
 const getImage = () => document.getElementById('hiddenImage');
 
 function onXChanged(newXOffset) {
@@ -97,13 +99,16 @@ function copyImageToCanvas(ctx) {
 
 function setDefaultHex(ctx) {
   const ratio = ctx.canvas.height / ctx.canvas.width;
-  const edge = (ratio > Math.sqrt(4/3)) ? ctx.canvas.width / Math.sqrt(3) : ctx.canvas.height / 2;
+
+  const lengthFromWidth = ctx.canvas.width / Math.sqrt(3);
+  const lengthFromHeight = ctx.canvas.height / 2;
+  const edge = Math.min(lengthFromWidth, lengthFromHeight);
   const xOffset = (ctx.canvas.width / 2) - edge * Math.sqrt(3/4);
   const yOffset = (ctx.canvas.height / 2) - edge;
 
   setEdgeLength(edge);
-  document.getElementById("x").value = xOffset;
-  document.getElementById("y").value = yOffset;
+  setXOffset(xOffset);
+  setYOffset(yOffset);
 }
 
 function drawHexOutline(ctx) {
