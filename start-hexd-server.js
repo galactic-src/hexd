@@ -1,12 +1,14 @@
 const express = require('express');
-var cors = require('cors');
+const cors = require('cors');
+const openurl = require('openurl');
+
+const LOCAL_PORT = 3000;
+
 const app = express();
-
 app.use(cors());
-app.use(express.static('./static'));
+app.use(express.static('./src'));
 
-const port = 3000;
 app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`)
+  console.log(`started hexd at at http://localhost:${LOCAL_PORT} - opening`);
+  openurl.open(`http://localhost:${LOCAL_PORT}`);
 })
-
