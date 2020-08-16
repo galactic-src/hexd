@@ -8,7 +8,7 @@ const app = express();
 app.use(cors());
 app.use(express.static('./src'));
 
-app.listen(port, () => {
+app.listen(LOCAL_PORT, () => {
   console.log(`started hexd at at http://localhost:${LOCAL_PORT} - opening`);
   openurl.open(`http://localhost:${LOCAL_PORT}`);
 })
