@@ -5,7 +5,7 @@ A little express/browser-based utility to load up a local texture image file, an
 ### Usage
 
 ```
-npm install && npm run
+npm install && npm start
 ```
 Then visit `localhost:3000/hexd.html`.
 
