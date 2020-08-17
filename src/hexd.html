@@ -21,38 +21,46 @@ const setYOffset = (yOffset) => document.getElementById('y').value = rounded(yOf
 const getImage = () => document.getElementById('hiddenImage');
 
 function onXChanged(newXOffset) {
-  if (newXOffset < 0) {
-    setXOffset(0);
-    setEdgeLength(getEdgeLength() - 1);
-  } else {
-    const canvasWidth = getCanvasWidth();
-    const edgeLength = getEdgeLength();
-    const hexWidth = calcHexWidth(edgeLength);
-    const newHexRight = newXOffset + hexWidth; 
+  const canvasWidth = getCanvasWidth();
+  const edgeLength = getEdgeLength();
+  const hexWidth = calcHexWidth(edgeLength);
 
-    if (newHexRight > canvasWidth) {
-      const newEdge = (canvasWidth - newXOffset) / SQRT3;
-      setEdgeLength(newEdge);
-    }
+  if (newXOffset < 0) {
+    newXOffset = 0;
+  } else if (newXOffset > canvasWidth) {
+    newXOffset = canvasWidth;
+  }
+
+  const newHexLeft = newXOffset - hexWidth / 2;
+  const newHexRight = newXOffset + hexWidth / 2; 
+
+  if (newHexLeft < 0) {
+    setEdgeLength(newXOffset / (SQRT3/2));
+  } else if (newHexRight > canvasWidth) {
+    setEdgeLength((canvasWidth - newXOffset) / (SQRT3/2));
   }
 
   redraw();
 }
 
 function onYChanged(newYOffset) {
+  const canvasHeight = getCanvasHeight();
+  const edgeLength = getEdgeLength();
+  const hexHeight = calcHexHeight(edgeLength);
+  
   if (newYOffset < 0) {
-    setYOffset(0)
-    setEdgeLength(getEdgeLength() - 1);
-  } else {
-    const canvasHeight = getCanvasHeight();
-    const edgeLength = getEdgeLength();
-    const hexHeight = calcHexHeight(edgeLength);
-    const newHexBottom = newYOffset + hexHeight;
+    newYOffset = 0;
+  } else if (newYOffset > canvasHeight) {
+    newYOffset = canvasHeight;
+  }
 
-    if (newHexBottom > canvasHeight) {
-      const newEdge = (canvasHeight - newYOffset) / 2;
-      setEdgeLength(newEdge);
-    }
+  const newHexTop = newYOffset - hexHeight / 2;
+  const newHexBottom = newYOffset + hexHeight / 2;
+
+  if (newHexTop < 0) {
+    setEdgeLength(newYOffset);
+  } else if (newHexBottom > canvasHeight) {
+    setEdgeLength(canvasHeight - newYOffset);
   }
 
   redraw();
@@ -77,14 +85,18 @@ function onEdgeChanged(newEdge) {
 
   const xOffset = getXOffset();
   const hexWidth = calcHexWidth(cappedEdge);
-  if (xOffset + hexWidth > canvasWidth) {
-    setXOffset(canvasWidth - hexWidth);
+  if (xOffset + hexWidth / 2 > canvasWidth) {
+    setXOffset(canvasWidth - hexWidth / 2);
+  } else if (xOffset - hexWidth / 2 < 0) {
+    setXOffset(hexWidth / 2);
   }
 
   const yOffset = getYOffset();
   const hexHeight = calcHexHeight(cappedEdge);
-  if (yOffset + hexHeight > canvasHeight) {
-    setYOffset(canvasHeight - hexHeight);
+  if (yOffset + hexHeight / 2 > canvasHeight) {
+    setYOffset(canvasHeight - hexHeight / 2);
+  } else if (yOffset - hexHeight / 2 < 0) {
+    setYOffset(hexHeight / 2)
   }
 
   redraw();
@@ -92,9 +104,19 @@ function onEdgeChanged(newEdge) {
 
 function redraw() {
   const ctx = getCanvasContext();
-  copyImageToCanvas(ctx);
-  cropHex(ctx);
-  //drawHexOutline(ctx);
+  if (getEdgeLength() === 0) {
+    clear(ctx);
+  } else {
+    copyImageToCanvas(ctx);
+    cropHex(ctx);
+    //drawHexOutline(ctx);
+  }
+}
+
+function clear(ctx) {
+  resetCtx(ctx);
+  ctx.globalCompositeOperation = 'destination-out';
+  ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 }
 
 function onFileSelected(evt) {
@@ -133,13 +155,12 @@ function copyImageToCanvas(ctx) {
 }
 
 function setDefaultHex(ctx) {
-  const ratio = ctx.canvas.height / ctx.canvas.width;
-
   const lengthFromWidth = ctx.canvas.width / SQRT3;
   const lengthFromHeight = ctx.canvas.height / 2;
   const edge = Math.min(lengthFromWidth, lengthFromHeight);
-  const xOffset = (ctx.canvas.width / 2) - calcHexWidth(edge) / 2;
-  const yOffset = (ctx.canvas.height / 2) - calcHexHeight(edge) / 2;
+
+  const xOffset = ctx.canvas.width / 2;
+  const yOffset = ctx.canvas.height / 2;
 
   setEdgeLength(edge);
   setXOffset(xOffset);
@@ -150,30 +171,34 @@ function drawHexOutline(ctx) {
   const xOffset = getXOffset();
   const yOffset = getYOffset();
   const edge = getEdgeLength();
+  const halfHexWidth = calcHexWidth(edge) / 2;
+  const halfHexHeight = calcHexHeight(edge) / 2;
+  const quarterHexHeight = halfHexHeight / 2;
 
   resetCtx(ctx);
   ctx.beginPath();
-	ctx.moveTo(xOffset, yOffset + edge * 0.5);
-	ctx.lineTo(xOffset, yOffset + edge * 1.5);
-	ctx.lineTo(xOffset + calcHexWidth(edge) / 2, yOffset + calcHexHeight(edge));
-	ctx.lineTo(xOffset + calcHexWidth(edge), yOffset + edge * 1.5);
-	ctx.lineTo(xOffset + calcHexWidth(edge), yOffset + edge * 0.5);
-	ctx.lineTo(xOffset + calcHexWidth(edge) / 2, yOffset);
-	ctx.lineTo(xOffset, yOffset + edge * 0.5);
+	ctx.moveTo(xOffset - halfHexWidth, yOffset - quarterHexHeight);
+	ctx.lineTo(xOffset - halfHexWidth, yOffset + quarterHexHeight);
+	ctx.lineTo(xOffset, yOffset + halfHexHeight);
+	ctx.lineTo(xOffset + halfHexWidth, yOffset + quarterHexHeight);
+	ctx.lineTo(xOffset + halfHexWidth, yOffset - quarterHexHeight);
+	ctx.lineTo(xOffset, yOffset - halfHexHeight);
+	ctx.closePath();
 	ctx.stroke();
 }
 
 function cropHex(ctx) {
   const edge = getEdgeLength();
-  const hexLeft = getXOffset();
-  const hexTop = getYOffset();
-
-  const hexHeight = calcHexHeight(edge);
-  const hexBottom = hexTop + hexHeight; 
+  const hexCentreX = getXOffset();
+  const hexCentreY = getYOffset();
 
   const hexWidth = calcHexWidth(edge);
-	const hexRight = hexLeft + hexWidth;
-  const hexMiddle = hexLeft + hexWidth/2;
+  const hexHeight = calcHexHeight(edge);
+
+  const hexTop = hexCentreY - hexHeight / 2;
+  const hexBottom = hexCentreY + hexHeight / 2; 
+	const hexRight = hexCentreX + hexWidth / 2;
+  const hexLeft = hexCentreX - hexWidth/2;
 
 	resetCtx(ctx);
   ctx.globalCompositeOperation = 'destination-out';
@@ -202,7 +227,7 @@ function cropHex(ctx) {
   ctx.moveTo(clipLeft, clipTop);
 	ctx.lineTo(clipLeft, hexTop + edge * 0.5 + 1);
 	ctx.lineTo(hexLeft, hexTop + edge * 0.5);
-	ctx.lineTo(hexMiddle, hexTop);
+	ctx.lineTo(hexCentreX, hexTop);
 	ctx.lineTo(hexRight, hexTop + edge * 0.5);
 	ctx.lineTo(clipRight, hexTop + edge * 0.5 + 1);
   ctx.lineTo(clipRight, clipTop);
@@ -213,7 +238,7 @@ function cropHex(ctx) {
   ctx.moveTo(clipLeft, clipBottom);
 	ctx.lineTo(clipLeft, hexBottom - edge * 0.5 - 1);
 	ctx.lineTo(hexLeft, hexBottom - edge * 0.5);
-	ctx.lineTo(hexMiddle, hexBottom);
+	ctx.lineTo(hexCentreX, hexBottom);
 	ctx.lineTo(hexRight, hexBottom - edge * 0.5);
 	ctx.lineTo(clipRight, hexBottom - edge * 0.5 - 1);
   ctx.lineTo(clipRight, clipBottom);
@@ -230,14 +255,26 @@ function resetCtx(ctx) {
 
 function handleDownload(exporter) {
   const edge = getEdgeLength();
+
+  if (edge === 0) {
+    alert('hex too small');
+    return;
+  }  
+
   const hexWidth = calcHexWidth(edge);
   const hexHeight = calcHexHeight(edge);
 
   const canvas = document.createElement('canvas');
   canvas.width  = hexWidth;
   canvas.height = hexHeight;
+  
+  const xOffset = getXOffset();
+  const yOffset = getYOffset();
+
+  const x = xOffset - hexWidth / 2;
+  const y = yOffset - hexHeight / 2;
   canvas.getContext('2d')
-    .drawImage(document.getElementById('output'), getXOffset(), getYOffset(), hexWidth, hexHeight, 0, 0, hexWidth, hexHeight);
+    .drawImage(document.getElementById('output'), x, y, hexWidth, hexHeight, 0, 0, hexWidth, hexHeight);
 
   exporter.href = canvas.toDataURL('image/png');
 }
@@ -246,9 +283,9 @@ function handleDownload(exporter) {
 </head>
 <body>
 <div><input type="file" onchange="onFileSelected(event)"></div>
-<div>x offset: <input type="number" id="x" oninput="onXChanged(this.value * 1)"/></div>
-<div>y offset: <input type="number" id="y" oninput="onYChanged(this.value * 1)"/></div>
-<div>edge: <input type="number" id="edge" oninput="onEdgeChanged(this.value * 1)"/><div>
+<div>x offset: <input type="number" id="x" onchange="onXChanged(this.value * 1)"/></div>
+<div>y offset: <input type="number" id="y" onchange="onYChanged(this.value * 1)"/></div>
+<div>edge: <input type="number" id="edge" onchange="onEdgeChanged(this.value * 1)"/><div>
 <div><canvas id="output" height = "0" width = "0" style="border: 2px solid blueviolet"></canvas></div>
 <div><a id="export" download="hexport.png" onclick="handleDownload(this)">Export</a></div>
 </body>
