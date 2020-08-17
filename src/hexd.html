@@ -9,6 +9,7 @@ const rounded = (scalar) => Math.round(scalar*100)/100;
 const calcHexHeight = (edgeLength) => edgeLength * 2;
 const calcHexWidth = (edgeLength) => edgeLength * SQRT3;
 
+const getBackgroundCanvasContext = () => document.getElementById('background').getContext("2d");
 const getEdgeLength = () => document.getElementById('edge').value * 1;
 const setEdgeLength = (edgeLength) => document.getElementById('edge').value = rounded(edgeLength);
 const getCanvasContext = () => document.getElementById('output').getContext("2d");
@@ -137,8 +138,12 @@ function onFileSelected(evt) {
   img.style = "position:absolute; top: -9999px; left: -9999px;";
   img.onload = function() {
     const ctx = getCanvasContext();
-    ctx.canvas.width = this.naturalWidth;
-    ctx.canvas.height = this.naturalHeight;
+    const ctx2 = getBackgroundCanvasContext();
+    ctx.canvas.width = ctx2.canvas.width = this.naturalWidth;
+    ctx.canvas.height = ctx2.canvas.height = this.naturalHeight;
+    resetCtx(ctx2);
+    ctx2.globalAlpha = 0.3;
+    ctx2.drawImage(getImage(), 0, 0);
 
     setDefaultHex(ctx);
 
@@ -150,7 +155,7 @@ function onFileSelected(evt) {
 
 function copyImageToCanvas(ctx) {
   resetCtx(ctx);
-  ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+  //ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
   ctx.drawImage(getImage(), 0, 0);
 }
 
@@ -286,7 +291,10 @@ function handleDownload(exporter) {
 <div>x offset: <input type="number" id="x" onchange="onXChanged(this.value * 1)"/></div>
 <div>y offset: <input type="number" id="y" onchange="onYChanged(this.value * 1)"/></div>
 <div>edge: <input type="number" id="edge" onchange="onEdgeChanged(this.value * 1)"/><div>
-<div><canvas id="output" height = "0" width = "0" style="border: 2px solid blueviolet"></canvas></div>
+<div style="position:relative">
+  <canvas id="output" height = "0" width = "0" style="border: 2px solid blueviolet; position: absolute; top: 0; left: 0; z-index: 0"></canvas>
+  <canvas id="background" height = "0" width = "0" style="border: 2px solid; position: relative; top: 0; left: 0; z-index: -1"></canvas>
+</div>
 <div><a id="export" download="hexport.png" onclick="handleDownload(this)">Export</a></div>
 </body>
 </html>
