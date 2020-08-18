@@ -22,6 +22,9 @@ const setYOffset = (yOffset) => document.getElementById('y').value = rounded(yOf
 const getImage = () => document.getElementById('hiddenImage');
 const getEdgeLocked = () => document.getElementById('edgeLocked').checked;
 
+let scaleCentreX = 0;
+let scaleCentreY = 0;
+
 window.onload = () => {
   const outputCanvas = document.getElementById('output');
   outputCanvas.addEventListener('mousemove', ({clientX, clientY}) => {
@@ -32,10 +35,14 @@ window.onload = () => {
     redraw();
     drawHexOutline(getCanvasContext(), mouseX, mouseY);
   });
+  
   outputCanvas.addEventListener('click', ({clientX, clientY}) => {
     const {left, top} = outputCanvas.getBoundingClientRect();
     const mouseX = clientX - left;
     const mouseY = clientY - top;
+
+    scaleCentreX = mouseX;
+    scaleCentreY = mouseY;
 
     const {x, y} = adjustHexCentre(mouseX, mouseY, getEdgeLength(), getCanvasWidth(), getCanvasHeight());
 
@@ -45,8 +52,29 @@ window.onload = () => {
     redraw();
     drawHexOutline(getCanvasContext(), mouseX, mouseY);
   });
+
   outputCanvas.addEventListener('mouseleave', () => {
     redraw();
+  });
+
+  outputCanvas.addEventListener('wheel', (e) => {
+    e.preventDefault();
+
+    if (getEdgeLocked()) {
+      return;
+    }
+
+    let newEdgeLength = getEdgeLength() + e.deltaY * 0.5;
+    if (newEdgeLength < 0) {
+      newEdgeLength = 0;
+    }
+
+    setXOffset(scaleCentreX);
+    onXChanged(scaleCentreX);
+    setYOffset(scaleCentreY);
+    onYChanged(scaleCentreY);
+    setEdgeLength(newEdgeLength);
+    onEdgeChanged(newEdgeLength);
   })
 }
 
@@ -62,6 +90,7 @@ function onXChanged(newXOffset) {
     newXOffset = canvasWidth;
   }
 
+  scaleCentreX = newXOffset;
   const newHexLeft = newXOffset - hexWidth / 2;
   const newHexRight = newXOffset + hexWidth / 2; 
 
@@ -94,6 +123,7 @@ function onYChanged(newYOffset) {
     newYOffset = canvasHeight;
   }
 
+  scaleCentreY = newYOffset;
   const newHexTop = newYOffset - hexHeight / 2;
   const newHexBottom = newYOffset + hexHeight / 2;
 
@@ -112,6 +142,8 @@ function onYChanged(newYOffset) {
   }
 
   redraw();
+
+  scaleCentreY = getYOffset();
 }
 
 function onEdgeChanged(newEdge) {
@@ -211,6 +243,8 @@ function setDefaultHex(ctx) {
 
   const xOffset = ctx.canvas.width / 2;
   const yOffset = ctx.canvas.height / 2;
+  scaleCentreX = xOffset;
+  scaleCentreY = yOffset;
 
   setEdgeLength(edge);
   setXOffset(xOffset);
@@ -258,8 +292,6 @@ function drawHexOutline(ctx, mouseX, mouseY) {
   const quarterHexHeight = halfHexHeight / 2;
 
   const {x, y} = adjustHexCentre(mouseX, mouseY, edge, canvasWidth, canvasHeight);
-  console.log(`x: ${x}`);
-  console.log(`y: ${y}`);
 
   resetCtx(ctx);
   ctx.beginPath();
