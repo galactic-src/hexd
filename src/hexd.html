@@ -44,7 +44,10 @@ window.onload = () => {
     
     redraw();
     drawHexOutline(getCanvasContext(), mouseX, mouseY);
-  }) 
+  });
+  outputCanvas.addEventListener('mouseleave', () => {
+    redraw();
+  })
 }
 
 function onXChanged(newXOffset) {
