@@ -20,7 +20,32 @@ const setXOffset = (xOffset) => document.getElementById('x').value = rounded(xOf
 const getYOffset = () => document.getElementById('y').value * 1;
 const setYOffset = (yOffset) => document.getElementById('y').value = rounded(yOffset);
 const getImage = () => document.getElementById('hiddenImage');
-const getEdgeLocked = () => document.getElementById('edgeLocked').checked
+const getEdgeLocked = () => document.getElementById('edgeLocked').checked;
+
+window.onload = () => {
+  const outputCanvas = document.getElementById('output');
+  outputCanvas.addEventListener('mousemove', ({clientX, clientY}) => {
+    const {left, top} = outputCanvas.getBoundingClientRect();
+    const mouseX = clientX - left;
+    const mouseY = clientY - top;
+    
+    redraw();
+    drawHexOutline(getCanvasContext(), mouseX, mouseY);
+  });
+  outputCanvas.addEventListener('click', ({clientX, clientY}) => {
+    const {left, top} = outputCanvas.getBoundingClientRect();
+    const mouseX = clientX - left;
+    const mouseY = clientY - top;
+
+    const {x, y} = adjustHexCentre(mouseX, mouseY, getEdgeLength(), getCanvasWidth(), getCanvasHeight());
+
+    setXOffset(x);
+    setYOffset(y);
+    
+    redraw();
+    drawHexOutline(getCanvasContext(), mouseX, mouseY);
+  }) 
+}
 
 function onXChanged(newXOffset) {
   const canvasWidth = getCanvasWidth();
@@ -129,7 +154,6 @@ function redraw() {
   } else {
     copyImageToCanvas(ctx);
     cropHex(ctx);
-    //drawHexOutline(ctx);
   }
 }
 
@@ -174,14 +198,13 @@ function onFileSelected(evt) {
 
 function copyImageToCanvas(ctx) {
   resetCtx(ctx);
-  //ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
   ctx.drawImage(getImage(), 0, 0);
 }
 
 function setDefaultHex(ctx) {
   const lengthFromWidth = ctx.canvas.width / SQRT3;
   const lengthFromHeight = ctx.canvas.height / 2;
-  const edge = Math.min(lengthFromWidth, lengthFromHeight);
+  const edge = Math.min(lengthFromWidth, lengthFromHeight, 80);
 
   const xOffset = ctx.canvas.width / 2;
   const yOffset = ctx.canvas.height / 2;
@@ -191,22 +214,58 @@ function setDefaultHex(ctx) {
   setYOffset(yOffset);
 }
 
-function drawHexOutline(ctx) {
-  const xOffset = getXOffset();
-  const yOffset = getYOffset();
+const adjustHexCentre = (x, y, edge, canvasWidth, canvasHeight) => {
+  return {
+    x: adjustX(x, edge, canvasWidth),
+    y: adjustY(y, edge, canvasHeight)
+  }
+}
+
+const adjustX = (x, edge, canvasWidth) => {
+  const hexWidth = calcHexWidth(edge);
+
+  if (x + hexWidth / 2 > canvasWidth) {
+    return canvasWidth - hexWidth / 2;
+  } else if (x - hexWidth / 2 < 0) {
+    return hexWidth / 2;
+  } else {
+    return x;
+  }
+}
+
+const adjustY = (y, edge, canvasHeight) => {
+  const hexHeight = calcHexHeight(edge);
+
+  if (y + hexHeight / 2 > canvasHeight) {
+    return canvasHeight - hexHeight / 2;
+  } else if (y - hexHeight / 2 < 0) {
+    return hexHeight / 2;
+  } else {
+    return y
+  }
+}
+
+function drawHexOutline(ctx, mouseX, mouseY) {
   const edge = getEdgeLength();
+  const canvasHeight = getCanvasHeight();
+  const canvasWidth = getCanvasWidth();
+
   const halfHexWidth = calcHexWidth(edge) / 2;
   const halfHexHeight = calcHexHeight(edge) / 2;
   const quarterHexHeight = halfHexHeight / 2;
 
+  const {x, y} = adjustHexCentre(mouseX, mouseY, edge, canvasWidth, canvasHeight);
+  console.log(`x: ${x}`);
+  console.log(`y: ${y}`);
+
   resetCtx(ctx);
   ctx.beginPath();
-	ctx.moveTo(xOffset - halfHexWidth, yOffset - quarterHexHeight);
-	ctx.lineTo(xOffset - halfHexWidth, yOffset + quarterHexHeight);
-	ctx.lineTo(xOffset, yOffset + halfHexHeight);
-	ctx.lineTo(xOffset + halfHexWidth, yOffset + quarterHexHeight);
-	ctx.lineTo(xOffset + halfHexWidth, yOffset - quarterHexHeight);
-	ctx.lineTo(xOffset, yOffset - halfHexHeight);
+	ctx.moveTo(x - halfHexWidth, y - quarterHexHeight);
+	ctx.lineTo(x - halfHexWidth, y + quarterHexHeight);
+	ctx.lineTo(x, y + halfHexHeight);
+	ctx.lineTo(x + halfHexWidth, y + quarterHexHeight);
+	ctx.lineTo(x + halfHexWidth, y - quarterHexHeight);
+	ctx.lineTo(x, y - halfHexHeight);
 	ctx.closePath();
 	ctx.stroke();
 }
