@@ -20,11 +20,13 @@ const setXOffset = (xOffset) => document.getElementById('x').value = rounded(xOf
 const getYOffset = () => document.getElementById('y').value * 1;
 const setYOffset = (yOffset) => document.getElementById('y').value = rounded(yOffset);
 const getImage = () => document.getElementById('hiddenImage');
+const getEdgeLocked = () => document.getElementById('edgeLocked').checked
 
 function onXChanged(newXOffset) {
   const canvasWidth = getCanvasWidth();
   const edgeLength = getEdgeLength();
   const hexWidth = calcHexWidth(edgeLength);
+  const edgeLocked = getEdgeLocked();
 
   if (newXOffset < 0) {
     newXOffset = 0;
@@ -36,9 +38,17 @@ function onXChanged(newXOffset) {
   const newHexRight = newXOffset + hexWidth / 2; 
 
   if (newHexLeft < 0) {
-    setEdgeLength(newXOffset / (SQRT3/2));
+    if (edgeLocked) {
+      setXOffset(hexWidth/2);
+    } else {
+      setEdgeLength(newXOffset / (SQRT3/2));
+    }
   } else if (newHexRight > canvasWidth) {
-    setEdgeLength((canvasWidth - newXOffset) / (SQRT3/2));
+    if (edgeLocked) {
+      setXOffset(canvasWidth - hexWidth / 2);
+    } else {
+      setEdgeLength((canvasWidth - newXOffset) / (SQRT3/2));
+    }
   }
 
   redraw();
@@ -48,6 +58,7 @@ function onYChanged(newYOffset) {
   const canvasHeight = getCanvasHeight();
   const edgeLength = getEdgeLength();
   const hexHeight = calcHexHeight(edgeLength);
+  const edgeLocked = getEdgeLocked();
   
   if (newYOffset < 0) {
     newYOffset = 0;
@@ -59,9 +70,17 @@ function onYChanged(newYOffset) {
   const newHexBottom = newYOffset + hexHeight / 2;
 
   if (newHexTop < 0) {
-    setEdgeLength(newYOffset);
+    if (edgeLocked) {
+      setYOffset(hexHeight / 2);
+    } else {
+      setEdgeLength(newYOffset);
+    }
   } else if (newHexBottom > canvasHeight) {
-    setEdgeLength(canvasHeight - newYOffset);
+    if (edgeLocked) {
+      setYOffset(canvasHeight - hexHeight / 2)
+    } else {
+      setEdgeLength(canvasHeight - newYOffset);
+    }
   }
 
   redraw();
@@ -288,12 +307,14 @@ function handleDownload(exporter) {
 </head>
 <body>
 <div><input type="file" onchange="onFileSelected(event)"></div>
-<div>x offset: <input type="number" id="x" onchange="onXChanged(this.value * 1)"/></div>
-<div>y offset: <input type="number" id="y" onchange="onYChanged(this.value * 1)"/></div>
-<div>edge: <input type="number" id="edge" onchange="onEdgeChanged(this.value * 1)"/><div>
+<div>Center X: <input type="number" id="x" onchange="onXChanged(this.value * 1)"/></div>
+<div>Center Y: <input type="number" id="y" onchange="onYChanged(this.value * 1)"/></div>
+<div>
+  Edge length: <input id="edge" type="number" onchange="onEdgeChanged(this.value * 1)"/>
+  Lock: <input id="edgeLocked" type="checkbox" />
 <div style="position:relative">
-  <canvas id="output" height = "0" width = "0" style="border: 2px solid blueviolet; position: absolute; top: 0; left: 0; z-index: 0"></canvas>
-  <canvas id="background" height = "0" width = "0" style="border: 2px solid; position: relative; top: 0; left: 0; z-index: -1"></canvas>
+  <canvas id="output" height = "0" width = "0" style="position: absolute; top: 0; left: 0; z-index: 0"></canvas>
+  <canvas id="background" height = "0" width = "0" style="position: relative; top: 0; left: 0; z-index: -1"></canvas>
 </div>
 <div><a id="export" download="hexport.png" onclick="handleDownload(this)">Export</a></div>
 </body>
