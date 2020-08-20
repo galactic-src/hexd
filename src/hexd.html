@@ -76,6 +76,41 @@ window.onload = () => {
     setEdgeLength(newEdgeLength);
     onEdgeChanged(newEdgeLength);
   })
+
+  const dropzone = document.getElementById('dropzone');
+
+  window.addEventListener('dragenter', function(e) {
+    dropzone.style.visibility = "visible";
+  });
+
+  const validFile = () => true;
+
+  // display appropriate mouse style
+  dropzone.addEventListener('dragenter', (e) => {
+    if (validFile()) {  // Test that the item being dragged is a valid one
+        e.dataTransfer.dropEffect = 'move';
+        e.preventDefault();
+    }
+  })
+
+  // display appropriate mouse style
+  dropzone.addEventListener('dragover', (e) => {
+    if (validFile()) {  // Test that the item being dragged is a valid one
+        e.dataTransfer.dropEffect = 'move';
+        e.preventDefault();
+    }
+  })
+
+  dropzone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dropzone.style.visibility = "hidden";
+    loadImage(e.dataTransfer.files[0]);
+  });
+
+  dropzone.addEventListener('dragleave', (e) => {
+    dropzone.style.visibility = "hidden";
+  });
 }
 
 function onXChanged(newXOffset) {
@@ -198,12 +233,17 @@ function clear(ctx) {
   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 }
 
-function onFileSelected(evt) {
+function onFileSelected(event) {
   const selectedFile = event.target.files[0];
   if (selectedFile === undefined) {
     return;
   }
 
+  loadImage(selectedFile);
+}
+
+function loadImage(file) {
+  
   const oldImg = getImage();
   if (oldImg !== null) {
     document.body.removeChild(oldImg);
@@ -212,7 +252,7 @@ function onFileSelected(evt) {
   const img = document.createElement('img');
   img.id = 'hiddenImage';
   img.origin = 'anonymous';
-  img.src = URL.createObjectURL(selectedFile);
+  img.src = URL.createObjectURL(file);
   img.style = "position:absolute; top: -9999px; left: -9999px;";
   img.onload = function() {
     const ctx = getCanvasContext();
@@ -400,6 +440,7 @@ function handleDownload(exporter) {
 </script>
 </head>
 <body>
+  <div id="dropzone" style="background-color: grey; visibility: hidden; height: 100%; width: 100%; position: absolute; top: 0; left: 0; z-index: 2;" ></div>
 <div><input type="file" onchange="onFileSelected(event)"></div>
 <div>Center X: <input type="number" id="x" onchange="onXChanged(this.value * 1)"/></div>
 <div>Center Y: <input type="number" id="y" onchange="onYChanged(this.value * 1)"/></div>
