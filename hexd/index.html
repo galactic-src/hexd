@@ -448,8 +448,8 @@ function handleDownload(exporter) {
   Edge length: <input id="edge" type="number" onchange="onEdgeChanged(this.value * 1)"/>
   Lock: <input id="edgeLocked" type="checkbox" />
 <div style="position:relative">
-  <canvas id="output" height = "0" width = "0" style="position: absolute; top: 0; left: 0; z-index: 0"></canvas>
-  <canvas id="background" height = "0" width = "0" style="position: relative; top: 0; left: 0; z-index: -1"></canvas>
+  <canvas id="output" height = "0" width = "0" style="position: absolute; top: 0; left: 0; z-index: 0; cursor: none"></canvas>
+  <canvas id="background" height = "0" width = "0" style="position: relative; top: 0; left: 0; z-index: -1; cursor: none"></canvas>
 </div>
 <div><a id="export" download="hexport.png" onclick="handleDownload(this)">Export</a></div>
 </body>
