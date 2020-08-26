@@ -361,7 +361,6 @@ function cropHex(ctx) {
   const clipHeight = clipBottom - clipTop;
   const clipLeft = Math.max(hexLeft-1, 0);
   const clipRight = Math.min(hexRight+1, ctx.canvas.width);
-  const clipWidth = clipRight - clipLeft;
 
   if (hexTop > 0) {
     ctx.fillRect(0, 0, ctx.canvas.width, hexTop);
