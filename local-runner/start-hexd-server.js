@@ -6,7 +6,7 @@ const LOCAL_PORT = 3000;
 
 const app = express();
 app.use(cors());
-app.use(express.static('../hexd'));
+app.use(express.static('./hexd'));
 
 app.listen(LOCAL_PORT, async () => {
   console.log(`started hexd at at http://localhost:${LOCAL_PORT} - opening`);

@@ -1,0 +1,28 @@
+{
+  "name": "hexit",
+  "version": "1.0.0",
+  "description": "A little browser-based utility to load up a local texture image file, and extract a hex area to a png with a transparent surrounding.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node ./local-runner/start-hexd-server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/galactic-src/hexd.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/galactic-src/hexd/issues"
+  },
+  "homepage": "https://github.com/galactic-src/hexd#readme",
+  "devDependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "open": "^7.1.0",
+    "webpack": "^4.44.1",
+    "webpack-cli": "^3.3.12"
+  }
+}
