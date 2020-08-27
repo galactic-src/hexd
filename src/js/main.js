@@ -5,14 +5,14 @@ const calcHexHeight = (edgeLength) => edgeLength * 2;
 const calcHexWidth = (edgeLength) => edgeLength * SQRT3;
 
 const getBackgroundCanvasContext = () => document.getElementById('background').getContext("2d");
-const getEdgeLength = () => document.getElementById('edge').value * 1;
+const getEdgeLength = () => parseFloat(document.getElementById('edge').value);
 const setEdgeLength = (edgeLength) => document.getElementById('edge').value = rounded(edgeLength);
 const getCanvasContext = () => document.getElementById('output').getContext("2d");
-const getCanvasHeight = () => document.getElementById('output').height * 1;
-const getCanvasWidth = () => document.getElementById('output').width * 1;
-const getXOffset = () => document.getElementById('x').value * 1;
+const getCanvasHeight = () => parseFloat(document.getElementById('output').height);
+const getCanvasWidth = () => parseFloat(document.getElementById('output').width);
+const getXOffset = () => parseFloat(document.getElementById('x').value);
 const setXOffset = (xOffset) => document.getElementById('x').value = rounded(xOffset);
-const getYOffset = () => document.getElementById('y').value * 1;
+const getYOffset = () => parseFloat(document.getElementById('y').value);
 const setYOffset = (yOffset) => document.getElementById('y').value = rounded(yOffset);
 const getImage = () => document.getElementById('hiddenImage');
 const getEdgeLocked = () => document.getElementById('edgeLocked').checked;
@@ -106,6 +106,19 @@ window.onload = () => {
   dropzone.addEventListener('dragleave', (e) => {
     dropzone.style.visibility = "hidden";
   });
+
+  const xInput = document.getElementById('x');
+  xInput.addEventListener('change', e => onXChanged(parseFloat(xInput.value)));
+  const yInput = document.getElementById('y');
+  yInput.addEventListener('change', e => onYChanged(parseFloat(yInput.value)));
+  const edgeInput = document.getElementById('edge');
+  edgeInput.addEventListener('change', e => onEdgeChanged(parseFloat(edgeInput.value)));
+
+  const fileSelector = document.getElementById('fileSelector');
+  fileSelector.addEventListener('change', e => onFileSelected(e.target.files[0]));
+
+  const exporter = document.getElementById('export');
+  exporter.addEventListener('click', e => handleDownload(exporter));
 }
 
 function onXChanged(newXOffset) {
@@ -228,8 +241,7 @@ function clear(ctx) {
   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 }
 
-function onFileSelected(event) {
-  const selectedFile = event.target.files[0];
+function onFileSelected(selectedFile) {
   if (selectedFile === undefined) {
     return;
   }
