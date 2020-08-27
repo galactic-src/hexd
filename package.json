@@ -4,7 +4,7 @@
   "description": "A little browser-based utility to load up a local texture image file, and extract a hex area to a png with a transparent surrounding.",
   "main": "index.js",
   "scripts": {
-    "build": "rm -rf ./dist && mkdir dist && cp ./src/index.html ./dist/ && webpack",
+    "build": "webpack",
     "start": "node ./local-runner/start-hexd-server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
