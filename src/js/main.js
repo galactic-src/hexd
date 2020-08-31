@@ -5,8 +5,8 @@ import state from './state'
 import dom, { updateBackgroundReference, updateOutputReference } from './dom'
 
 const getImage = () => document.getElementById('hiddenImage');
-const getCanvasHeight = () => parseFloat(document.getElementById('output').height);
-const getCanvasWidth = () => parseFloat(document.getElementById('output').width);
+const getCanvasHeight = () => parseFloat(dom.canvas.output.height);
+const getCanvasWidth = () => parseFloat(dom.canvas.output.width);
 
 window.onload = () => {
     updateBackgroundReference();
