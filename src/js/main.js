@@ -2,8 +2,8 @@ import { SQRT3, calcHexHeight, calcHexWidth } from './hex'
 import { getEdgeLength, setEdgeLength, getXOffset, setXOffset, getYOffset, setYOffset, getEdgeLocked } from './controls'
 import { resetCtx } from './draw'
 import state from './state'
+import dom, { updateBackgroundReference } from './dom'
 
-const getBackgroundCanvasContext = () => document.getElementById('background').getContext("2d");
 const getImage = () => document.getElementById('hiddenImage');
 const getCanvasContext = () => document.getElementById('output').getContext("2d");
 const getCanvasHeight = () => parseFloat(document.getElementById('output').height);
@@ -108,6 +108,8 @@ window.onload = () => {
 
     const exporter = document.getElementById('export');
     exporter.addEventListener('click', e => handleDownload(exporter));
+
+    updateBackgroundReference();
 }
 
 function onXChanged(newXOffset) {
@@ -252,7 +254,7 @@ function loadImage(file) {
     img.style = "position:absolute; top: -9999px; left: -9999px;";
     img.onload = function() {
         const ctx = getCanvasContext();
-        const ctx2 = getBackgroundCanvasContext();
+        const ctx2 = dom.canvas.backgroundCanvas;
         ctx.canvas.width = ctx2.canvas.width = this.naturalWidth;
         ctx.canvas.height = ctx2.canvas.height = this.naturalHeight;
         resetCtx(ctx2);
