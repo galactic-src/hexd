@@ -2,26 +2,27 @@ import { SQRT3, calcHexHeight, calcHexWidth } from './hex'
 import { getEdgeLength, setEdgeLength, getXOffset, setXOffset, getYOffset, setYOffset, getEdgeLocked } from './controls'
 import { resetCtx } from './draw'
 import state from './state'
-import dom, { updateBackgroundReference } from './dom'
+import dom, { updateBackgroundReference, updateOutputReference } from './dom'
 
 const getImage = () => document.getElementById('hiddenImage');
-const getCanvasContext = () => document.getElementById('output').getContext("2d");
 const getCanvasHeight = () => parseFloat(document.getElementById('output').height);
 const getCanvasWidth = () => parseFloat(document.getElementById('output').width);
 
 window.onload = () => {
-    const outputCanvas = document.getElementById('output');
-    outputCanvas.addEventListener('mousemove', ({ clientX, clientY }) => {
-        const { left, top } = outputCanvas.getBoundingClientRect();
+    updateBackgroundReference();
+    updateOutputReference();
+
+    dom.canvas.output.addEventListener('mousemove', ({ clientX, clientY }) => {
+        const { left, top } = dom.canvas.output.getBoundingClientRect();
         const mouseX = clientX - left;
         const mouseY = clientY - top;
 
         redraw();
-        drawHexOutline(getCanvasContext(), mouseX, mouseY);
+        drawHexOutline(dom.canvas.outputCanvas, mouseX, mouseY);
     });
 
-    outputCanvas.addEventListener('click', ({ clientX, clientY }) => {
-        const { left, top } = outputCanvas.getBoundingClientRect();
+    dom.canvas.output.addEventListener('click', ({ clientX, clientY }) => {
+        const { left, top } = dom.canvas.output.getBoundingClientRect();
         const mouseX = clientX - left;
         const mouseY = clientY - top;
 
@@ -34,14 +35,14 @@ window.onload = () => {
         setYOffset(y);
 
         redraw();
-        drawHexOutline(getCanvasContext(), mouseX, mouseY);
+        drawHexOutline(dom.canvas.outputCanvas, mouseX, mouseY);
     });
 
-    outputCanvas.addEventListener('mouseleave', () => {
+    dom.canvas.output.addEventListener('mouseleave', () => {
         redraw();
     });
 
-    outputCanvas.addEventListener('wheel', (e) => {
+    dom.canvas.output.addEventListener('wheel', (e) => {
         e.preventDefault();
 
         if (getEdgeLocked()) {
@@ -108,8 +109,6 @@ window.onload = () => {
 
     const exporter = document.getElementById('export');
     exporter.addEventListener('click', e => handleDownload(exporter));
-
-    updateBackgroundReference();
 }
 
 function onXChanged(newXOffset) {
@@ -217,7 +216,7 @@ function onEdgeChanged(newEdge) {
 }
 
 function redraw() {
-    const ctx = getCanvasContext();
+    const ctx = dom.canvas.outputCanvas;
     if (getEdgeLength() === 0) {
         clear(ctx);
     } else {
@@ -253,7 +252,7 @@ function loadImage(file) {
     img.src = URL.createObjectURL(file);
     img.style = "position:absolute; top: -9999px; left: -9999px;";
     img.onload = function() {
-        const ctx = getCanvasContext();
+        const ctx = dom.canvas.outputCanvas;
         const ctx2 = dom.canvas.backgroundCanvas;
         ctx.canvas.width = ctx2.canvas.width = this.naturalWidth;
         ctx.canvas.height = ctx2.canvas.height = this.naturalHeight;
