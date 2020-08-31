@@ -2,7 +2,7 @@ import { SQRT3, calcHexHeight, calcHexWidth } from './hex'
 import { getEdgeLength, setEdgeLength, getXOffset, setXOffset, getYOffset, setYOffset, getEdgeLocked } from './controls'
 import { resetCtx } from './draw'
 import state from './state'
-import dom, { updateBackgroundReference, updateOutputReference } from './dom'
+import dom, { updateBackgroundReference, updateOutputReference, updatePositionReferences } from './dom'
 
 const getImage = () => document.getElementById('hiddenImage');
 const getCanvasHeight = () => parseFloat(dom.canvas.output.height);
@@ -11,6 +11,7 @@ const getCanvasWidth = () => parseFloat(dom.canvas.output.width);
 window.onload = () => {
     updateBackgroundReference();
     updateOutputReference();
+    updatePositionReferences();
 
     dom.canvas.output.addEventListener('mousemove', ({ clientX, clientY }) => {
         const { left, top } = dom.canvas.output.getBoundingClientRect();
@@ -97,10 +98,8 @@ window.onload = () => {
         dropzone.style.visibility = "hidden";
     });
 
-    const xInput = document.getElementById('x');
-    xInput.addEventListener('change', e => onXChanged(parseFloat(xInput.value)));
-    const yInput = document.getElementById('y');
-    yInput.addEventListener('change', e => onYChanged(parseFloat(yInput.value)));
+    dom.control.xCentre.addEventListener('change', e => onXChanged(parseFloat(dom.control.xCentre.value)));
+    dom.control.yCentre.addEventListener('change', e => onYChanged(parseFloat(dom.control.yCentre.value)));
     const edgeInput = document.getElementById('edge');
     edgeInput.addEventListener('change', e => onEdgeChanged(parseFloat(edgeInput.value)));
 

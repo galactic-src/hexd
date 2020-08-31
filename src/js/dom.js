@@ -4,6 +4,10 @@ const domReferences = {
         "backgroundCanvas": undefined,
         "output": undefined,
         "outputCanvas": undefined
+    },
+    "control": {
+        "xCentre": undefined,
+        "yCentre": undefined
     }
 }
 
@@ -17,6 +21,11 @@ export const updateOutputReference = () => {
     const output = document.getElementById('output');
     domReferences.canvas.output = output;
     domReferences.canvas.outputCanvas = output.getContext("2d");
+}
+
+export const updatePositionReferences = () => {
+    domReferences.control.xCentre = document.getElementById('x');
+    domReferences.control.yCentre = document.getElementById('y');
 }
 
 export default domReferences;
