@@ -114,7 +114,7 @@ window.onload = () => {
     dom.control.yCentre.addEventListener('change', e => onYChanged(parseFloat(dom.control.yCentre.value)));
     dom.control.edge.addEventListener('change', e => onEdgeChanged(parseFloat(dom.control.edge.value)));
     dom.control.fileSelector.addEventListener('change', e => onFileSelected(e.target.files[0]));
-    dom.control.exportButton.addEventListener('click', e => handleDownload(dom.control.export));
+    dom.control.exportButton.addEventListener('click', e => handleDownload(dom.control.exportButton));
 }
 
 function onXChanged(newXOffset) {
@@ -426,7 +426,7 @@ function handleDownload(exporter) {
     const x = xOffset - hexWidth / 2;
     const y = yOffset - hexHeight / 2;
     canvas.getContext('2d')
-        .drawImage(document.getElementById('output'), x, y, hexWidth, hexHeight, 0, 0, hexWidth, hexHeight);
+        .drawImage(dom.image.output, x, y, hexWidth, hexHeight, 0, 0, hexWidth, hexHeight);
 
     exporter.href = canvas.toDataURL('image/png');
 }
