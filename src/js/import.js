@@ -4,7 +4,7 @@ import { resetCtx, redraw } from './draw'
 import { SQRT3 } from './hex'
 import state from './state'
 
-export const onFileDropped = selectedFile => loadImage(selectedFile);
+const onFileDropped = selectedFile => loadImage(selectedFile);
 
 export const onFileSelected = selectedFile => {
     if (selectedFile === undefined) {
@@ -54,4 +54,39 @@ const setDefaultHex = ctx => {
     setEdgeLength(edge);
     setXOffset(xOffset);
     setYOffset(yOffset);
+}
+
+const validFile = () => true;
+
+export const setupImport = () => {
+    window.addEventListener('dragenter', function(e) {
+        dom.dropzone.style.visibility = "visible";
+    });
+
+    dom.dropzone.addEventListener('dragleave', (e) => {
+        dom.dropzone.style.visibility = "hidden";
+    });
+
+    dom.dropzone.addEventListener('dragenter', (e) => {
+        if (validFile()) {
+            e.dataTransfer.dropEffect = 'move';
+            e.preventDefault();
+        }
+    })
+
+    dom.dropzone.addEventListener('dragover', (e) => {
+        if (validFile()) {
+            e.dataTransfer.dropEffect = 'move';
+            e.preventDefault();
+        }
+    })
+
+    dom.dropzone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dom.dropzone.style.visibility = "hidden";
+        onFileDropped(e.dataTransfer.files[0]);
+    });
+
+    dom.control.fileSelector.addEventListener('change', e => onFileSelected(e.target.files[0]));
 }
