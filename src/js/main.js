@@ -2,7 +2,14 @@ import { SQRT3, calcHexHeight, calcHexWidth } from './hex'
 import { getEdgeLength, setEdgeLength, getXOffset, setXOffset, getYOffset, setYOffset, getEdgeLocked } from './controls'
 import { resetCtx } from './draw'
 import state from './state'
-import dom, { updateBackgroundReference, updateOutputReference, updatePositionReferences } from './dom'
+import dom, {
+    updateBackgroundReference,
+    updateOutputReference,
+    updatePositionReferences,
+    updateEdgeReference,
+    updateFileSelectorReference,
+    updateExportButtonReference
+} from './dom'
 
 const getImage = () => document.getElementById('hiddenImage');
 const getCanvasHeight = () => parseFloat(dom.canvas.output.height);
@@ -12,6 +19,9 @@ window.onload = () => {
     updateBackgroundReference();
     updateOutputReference();
     updatePositionReferences();
+    updateEdgeReference();
+    updateFileSelectorReference();
+    updateExportButtonReference();
 
     dom.canvas.output.addEventListener('mousemove', ({ clientX, clientY }) => {
         const { left, top } = dom.canvas.output.getBoundingClientRect();
@@ -100,11 +110,8 @@ window.onload = () => {
 
     dom.control.xCentre.addEventListener('change', e => onXChanged(parseFloat(dom.control.xCentre.value)));
     dom.control.yCentre.addEventListener('change', e => onYChanged(parseFloat(dom.control.yCentre.value)));
-    const edgeInput = document.getElementById('edge');
-    edgeInput.addEventListener('change', e => onEdgeChanged(parseFloat(edgeInput.value)));
-
-    const fileSelector = document.getElementById('fileSelector');
-    fileSelector.addEventListener('change', e => onFileSelected(e.target.files[0]));
+    dom.control.edge.addEventListener('change', e => onEdgeChanged(parseFloat(dom.control.edge.value)));
+    dom.control.fileSelector.addEventListener('change', e => onFileSelected(e.target.files[0]));
 
     const exporter = document.getElementById('export');
     exporter.addEventListener('click', e => handleDownload(exporter));

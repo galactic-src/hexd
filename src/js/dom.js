@@ -7,7 +7,10 @@ const domReferences = {
     },
     "control": {
         "xCentre": undefined,
-        "yCentre": undefined
+        "yCentre": undefined,
+        "edge": undefined,
+        "fileSelector": undefined,
+        "exportButton": undefined
     }
 }
 
@@ -26,6 +29,18 @@ export const updateOutputReference = () => {
 export const updatePositionReferences = () => {
     domReferences.control.xCentre = document.getElementById('x');
     domReferences.control.yCentre = document.getElementById('y');
+}
+
+export const updateEdgeReference = () => {
+    domReferences.control.edge = document.getElementById('edge');
+}
+
+export const updateFileSelectorReference = () => {
+    domReferences.control.fileSelector = document.getElementById('fileSelector');
+}
+
+export const updateExportButtonReference = () => {
+    domReferences.control.exportButton = document.getElementById('export');
 }
 
 export default domReferences;
