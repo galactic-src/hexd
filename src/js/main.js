@@ -9,12 +9,12 @@ import dom, {
     updateEdgeReference,
     updateFileSelectorReference,
     updateExportButtonReference,
-    updateEdgeLockedReference
+    updateEdgeLockedReference,
+    updateHiddenImageReference
 } from './dom'
 
-const getImage = () => document.getElementById('hiddenImage');
-const getCanvasHeight = () => parseFloat(dom.canvas.output.height);
-const getCanvasWidth = () => parseFloat(dom.canvas.output.width);
+const getCanvasHeight = () => parseFloat(dom.image.output.height);
+const getCanvasWidth = () => parseFloat(dom.image.output.width);
 
 window.onload = () => {
     updateBackgroundReference();
@@ -25,17 +25,17 @@ window.onload = () => {
     updateExportButtonReference();
     updateEdgeLockedReference();
 
-    dom.canvas.output.addEventListener('mousemove', ({ clientX, clientY }) => {
-        const { left, top } = dom.canvas.output.getBoundingClientRect();
+    dom.image.output.addEventListener('mousemove', ({ clientX, clientY }) => {
+        const { left, top } = dom.image.output.getBoundingClientRect();
         const mouseX = clientX - left;
         const mouseY = clientY - top;
 
         redraw();
-        drawHexOutline(dom.canvas.outputCanvas, mouseX, mouseY);
+        drawHexOutline(dom.image.outputCanvas, mouseX, mouseY);
     });
 
-    dom.canvas.output.addEventListener('click', ({ clientX, clientY }) => {
-        const { left, top } = dom.canvas.output.getBoundingClientRect();
+    dom.image.output.addEventListener('click', ({ clientX, clientY }) => {
+        const { left, top } = dom.image.output.getBoundingClientRect();
         const mouseX = clientX - left;
         const mouseY = clientY - top;
 
@@ -48,14 +48,14 @@ window.onload = () => {
         setYOffset(y);
 
         redraw();
-        drawHexOutline(dom.canvas.outputCanvas, mouseX, mouseY);
+        drawHexOutline(dom.image.outputCanvas, mouseX, mouseY);
     });
 
-    dom.canvas.output.addEventListener('mouseleave', () => {
+    dom.image.output.addEventListener('mouseleave', () => {
         redraw();
     });
 
-    dom.canvas.output.addEventListener('wheel', (e) => {
+    dom.image.output.addEventListener('wheel', (e) => {
         e.preventDefault();
 
         if (getEdgeLocked()) {
@@ -222,7 +222,7 @@ function onEdgeChanged(newEdge) {
 }
 
 function redraw() {
-    const ctx = dom.canvas.outputCanvas;
+    const ctx = dom.image.outputCanvas;
     if (getEdgeLength() === 0) {
         clear(ctx);
     } else {
@@ -246,9 +246,7 @@ function onFileSelected(selectedFile) {
 }
 
 function loadImage(file) {
-
-    const oldImg = getImage();
-    if (oldImg !== null) {
+    if (dom.image.hiddenImage !== undefined) {
         document.body.removeChild(oldImg);
     }
 
@@ -258,13 +256,14 @@ function loadImage(file) {
     img.src = URL.createObjectURL(file);
     img.style = "position:absolute; top: -9999px; left: -9999px;";
     img.onload = function() {
-        const ctx = dom.canvas.outputCanvas;
-        const ctx2 = dom.canvas.backgroundCanvas;
+        updateHiddenImageReference();
+        const ctx = dom.image.outputCanvas;
+        const ctx2 = dom.image.backgroundCanvas;
         ctx.canvas.width = ctx2.canvas.width = this.naturalWidth;
         ctx.canvas.height = ctx2.canvas.height = this.naturalHeight;
         resetCtx(ctx2);
         ctx2.globalAlpha = 0.3;
-        ctx2.drawImage(getImage(), 0, 0);
+        ctx2.drawImage(dom.image.hiddenImage, 0, 0);
 
         setDefaultHex(ctx);
 
@@ -276,7 +275,7 @@ function loadImage(file) {
 
 function copyImageToCanvas(ctx) {
     resetCtx(ctx);
-    ctx.drawImage(getImage(), 0, 0);
+    ctx.drawImage(dom.image.hiddenImage, 0, 0);
 }
 
 function setDefaultHex(ctx) {

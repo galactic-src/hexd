@@ -1,9 +1,10 @@
 const domReferences = {
-    "canvas": {
+    "image": {
         "background": undefined,
         "backgroundCanvas": undefined,
         "output": undefined,
-        "outputCanvas": undefined
+        "outputCanvas": undefined,
+        "hiddenImage": undefined
     },
     "control": {
         "xCentre": undefined,
@@ -17,14 +18,14 @@ const domReferences = {
 
 export const updateBackgroundReference = () => {
     const background = document.getElementById('background');
-    domReferences.canvas.background = background;
-    domReferences.canvas.backgroundCanvas = background.getContext("2d");
+    domReferences.image.background = background;
+    domReferences.image.backgroundCanvas = background.getContext("2d");
 }
 
 export const updateOutputReference = () => {
     const output = document.getElementById('output');
-    domReferences.canvas.output = output;
-    domReferences.canvas.outputCanvas = output.getContext("2d");
+    domReferences.image.output = output;
+    domReferences.image.outputCanvas = output.getContext("2d");
 }
 
 export const updatePositionReferences = () => {
@@ -46,6 +47,10 @@ export const updateExportButtonReference = () => {
 
 export const updateEdgeLockedReference = () => {
     domReferences.control.edgeLocked = document.getElementById('edgeLocked');
+}
+
+export const updateHiddenImageReference = () => {
+    domReferences.image.hiddenImage = document.getElementById('hiddenImage');
 }
 
 export default domReferences;
