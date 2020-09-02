@@ -10,7 +10,8 @@ import dom, {
     updateFileSelectorReference,
     updateExportButtonReference,
     updateEdgeLockedReference,
-    updateHiddenImageReference
+    updateHiddenImageReference,
+    updateDropzoneReference
 } from './dom'
 
 const getCanvasHeight = () => parseFloat(dom.image.output.height);
@@ -24,6 +25,7 @@ window.onload = () => {
     updateFileSelectorReference();
     updateExportButtonReference();
     updateEdgeLockedReference();
+    updateDropzoneReference();
 
     dom.image.output.addEventListener('mousemove', ({ clientX, clientY }) => {
         const { left, top } = dom.image.output.getBoundingClientRect();
@@ -75,16 +77,14 @@ window.onload = () => {
         onEdgeChanged(newEdgeLength);
     })
 
-    const dropzone = document.getElementById('dropzone');
-
     window.addEventListener('dragenter', function(e) {
-        dropzone.style.visibility = "visible";
+        dom.dropzone.style.visibility = "visible";
     });
 
     const validFile = () => true;
 
     // display appropriate mouse style
-    dropzone.addEventListener('dragenter', (e) => {
+    dom.dropzone.addEventListener('dragenter', (e) => {
         if (validFile()) { // Test that the item being dragged is a valid one
             e.dataTransfer.dropEffect = 'move';
             e.preventDefault();
@@ -92,22 +92,22 @@ window.onload = () => {
     })
 
     // display appropriate mouse style
-    dropzone.addEventListener('dragover', (e) => {
+    dom.dropzone.addEventListener('dragover', (e) => {
         if (validFile()) { // Test that the item being dragged is a valid one
             e.dataTransfer.dropEffect = 'move';
             e.preventDefault();
         }
     })
 
-    dropzone.addEventListener('drop', (e) => {
+    dom.dropzone.addEventListener('drop', (e) => {
         e.preventDefault();
         e.stopPropagation();
-        dropzone.style.visibility = "hidden";
+        dom.dropzone.style.visibility = "hidden";
         loadImage(e.dataTransfer.files[0]);
     });
 
-    dropzone.addEventListener('dragleave', (e) => {
-        dropzone.style.visibility = "hidden";
+    dom.dropzone.addEventListener('dragleave', (e) => {
+        dom.dropzone.style.visibility = "hidden";
     });
 
     dom.control.xCentre.addEventListener('change', e => onXChanged(parseFloat(dom.control.xCentre.value)));

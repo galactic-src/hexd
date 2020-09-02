@@ -13,7 +13,8 @@ const domReferences = {
         "edgeLocked": undefined,
         "fileSelector": undefined,
         "exportButton": undefined
-    }
+    },
+    "dropzone": undefined
 }
 
 export const updateBackgroundReference = () => {
@@ -51,6 +52,10 @@ export const updateEdgeLockedReference = () => {
 
 export const updateHiddenImageReference = () => {
     domReferences.image.hiddenImage = document.getElementById('hiddenImage');
+}
+
+export const updateDropzoneReference = () => {
+    domReferences.dropzone = document.getElementById('dropzone');
 }
 
 export default domReferences;
