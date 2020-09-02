@@ -9,6 +9,7 @@ const domReferences = {
         "xCentre": undefined,
         "yCentre": undefined,
         "edge": undefined,
+        "edgeLocked": undefined,
         "fileSelector": undefined,
         "exportButton": undefined
     }
@@ -41,6 +42,10 @@ export const updateFileSelectorReference = () => {
 
 export const updateExportButtonReference = () => {
     domReferences.control.exportButton = document.getElementById('export');
+}
+
+export const updateEdgeLockedReference = () => {
+    domReferences.control.edgeLocked = document.getElementById('edgeLocked');
 }
 
 export default domReferences;

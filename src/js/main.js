@@ -8,7 +8,8 @@ import dom, {
     updatePositionReferences,
     updateEdgeReference,
     updateFileSelectorReference,
-    updateExportButtonReference
+    updateExportButtonReference,
+    updateEdgeLockedReference
 } from './dom'
 
 const getImage = () => document.getElementById('hiddenImage');
@@ -22,6 +23,7 @@ window.onload = () => {
     updateEdgeReference();
     updateFileSelectorReference();
     updateExportButtonReference();
+    updateEdgeLockedReference();
 
     dom.canvas.output.addEventListener('mousemove', ({ clientX, clientY }) => {
         const { left, top } = dom.canvas.output.getBoundingClientRect();
@@ -112,9 +114,7 @@ window.onload = () => {
     dom.control.yCentre.addEventListener('change', e => onYChanged(parseFloat(dom.control.yCentre.value)));
     dom.control.edge.addEventListener('change', e => onEdgeChanged(parseFloat(dom.control.edge.value)));
     dom.control.fileSelector.addEventListener('change', e => onFileSelected(e.target.files[0]));
-
-    const exporter = document.getElementById('export');
-    exporter.addEventListener('click', e => handleDownload(exporter));
+    dom.control.exportButton.addEventListener('click', e => handleDownload(dom.control.export));
 }
 
 function onXChanged(newXOffset) {
