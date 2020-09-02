@@ -4,7 +4,9 @@ const domReferences = {
         "backgroundCanvas": undefined,
         "output": undefined,
         "outputCanvas": undefined,
-        "hiddenImage": undefined
+        "hiddenImage": undefined,
+        "export": undefined,
+        "exportCanvas": undefined
     },
     "control": {
         "xCentre": undefined,
@@ -15,6 +17,12 @@ const domReferences = {
         "exportButton": undefined
     },
     "dropzone": undefined
+}
+
+export const setupExportCanvas = () => {
+    const exportCanvas = document.createElement('canvas');
+    domReferences.image.export = exportCanvas;
+    domReferences.image.exportCanvas = exportCanvas.getContext('2d');
 }
 
 export const updateBackgroundReference = () => {

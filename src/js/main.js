@@ -11,7 +11,8 @@ import dom, {
     updateExportButtonReference,
     updateEdgeLockedReference,
     updateHiddenImageReference,
-    updateDropzoneReference
+    updateDropzoneReference,
+    setupExportCanvas
 } from './dom'
 
 const getCanvasHeight = () => parseFloat(dom.image.output.height);
@@ -26,6 +27,7 @@ window.onload = () => {
     updateExportButtonReference();
     updateEdgeLockedReference();
     updateDropzoneReference();
+    setupExportCanvas();
 
     dom.image.output.addEventListener('mousemove', ({ clientX, clientY }) => {
         const { left, top } = dom.image.output.getBoundingClientRect();
@@ -416,17 +418,16 @@ function handleDownload(exporter) {
     const hexWidth = calcHexWidth(edge);
     const hexHeight = calcHexHeight(edge);
 
-    const canvas = document.createElement('canvas');
-    canvas.width = hexWidth;
-    canvas.height = hexHeight;
+    dom.image.export.width = hexWidth;
+    dom.image.export.height = hexHeight;
 
     const xOffset = getXOffset();
     const yOffset = getYOffset();
 
     const x = xOffset - hexWidth / 2;
     const y = yOffset - hexHeight / 2;
-    canvas.getContext('2d')
+    dom.image.exportCanvas
         .drawImage(dom.image.output, x, y, hexWidth, hexHeight, 0, 0, hexWidth, hexHeight);
 
-    exporter.href = canvas.toDataURL('image/png');
+    exporter.href = dom.image.export.toDataURL('image/png');
 }
