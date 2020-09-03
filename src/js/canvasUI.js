@@ -5,31 +5,12 @@ import { SQRT3, adjustHexCentre, calcHexWidth, calcHexHeight } from './hex'
 import state from './state'
 
 export const setupCanvasUI = () => {
-    dom.image.output.addEventListener('mousemove', ({ clientX, clientY }) => {
-        const { left, top } = dom.image.output.getBoundingClientRect();
-        const mouseX = clientX - left;
-        const mouseY = clientY - top;
+    document.body.addEventListener('mouseup', e => state.outputDrag = false);
+    document.body.addEventListener('mouseleave', e => state.outputDrag = false);
+    dom.image.output.addEventListener('mousedown', e => state.outputDrag = true);
 
-        redraw();
-        drawHexOutline(dom.image.outputCanvas, mouseX, mouseY);
-    });
-
-    dom.image.output.addEventListener('click', ({ clientX, clientY }) => {
-        const { left, top } = dom.image.output.getBoundingClientRect();
-        const mouseX = clientX - left;
-        const mouseY = clientY - top;
-
-        state.scaleCentreX = mouseX;
-        state.scaleCentreY = mouseY;
-
-        const { x, y } = adjustHexCentre(mouseX, mouseY, getEdgeLength(), getCanvasWidth(), getCanvasHeight());
-
-        setXOffset(x);
-        setYOffset(y);
-
-        redraw();
-        drawHexOutline(dom.image.outputCanvas, mouseX, mouseY);
-    });
+    dom.image.output.addEventListener('mousemove', e => handleMouseInteraction(e, state.outputDrag));
+    dom.image.output.addEventListener('click', e => handleMouseInteraction(e, true));
 
     dom.image.output.addEventListener('mouseleave', () => {
         redraw();
@@ -56,6 +37,25 @@ export const setupCanvasUI = () => {
     })
 }
 
+const handleMouseInteraction = ({ clientX, clientY }, reposition) => {
+    const { left, top } = dom.image.output.getBoundingClientRect();
+    const mouseX = clientX - left;
+    const mouseY = clientY - top;
+
+    if (reposition) {
+        state.scaleCentreX = mouseX;
+        state.scaleCentreY = mouseY;
+
+        const { x, y } = adjustHexCentre(mouseX, mouseY, getEdgeLength(), getCanvasWidth(), getCanvasHeight());
+
+        setXOffset(x);
+        setYOffset(y);
+    }
+
+    redraw();
+    drawHexOutline(dom.image.outputCanvas, mouseX, mouseY);
+}
+
 export const setupControls = () => {
     dom.control.xCentre.addEventListener('change', e => onXChanged(parseFloat(dom.control.xCentre.value)));
     dom.control.yCentre.addEventListener('change', e => onYChanged(parseFloat(dom.control.yCentre.value)));
@@ -68,16 +68,11 @@ const onXChanged = newXOffset => {
     const hexWidth = calcHexWidth(edgeLength);
     const edgeLocked = getEdgeLocked();
 
-    console.log(newXOffset);
-    console.log(canvasWidth);
-
     if (newXOffset < 2) {
         newXOffset = 2;
     } else if (newXOffset > canvasWidth - 2) {
         newXOffset = canvasWidth - 2;
     }
-
-    console.log(newXOffset);
 
     state.scaleCentreX = newXOffset;
     const newHexLeft = newXOffset - hexWidth / 2;
