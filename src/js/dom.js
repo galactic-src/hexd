@@ -6,7 +6,7 @@ const domReferences = {
         "outputCanvas": undefined,
         "hiddenImage": undefined,
         "export": undefined,
-        "exportCanvas": undefined
+        "exportCanvas": undefined,
     },
     "control": {
         "xCentre": undefined,
@@ -14,9 +14,10 @@ const domReferences = {
         "edge": undefined,
         "edgeLocked": undefined,
         "fileSelector": undefined,
-        "exportButton": undefined
+        "exportButton": undefined,
+        "exportFileName": undefined,
     },
-    "dropzone": undefined
+    "dropzone": undefined,
 }
 
 export const initDom = () => {
@@ -34,6 +35,8 @@ export const initDom = () => {
     domReferences.control.fileSelector = document.getElementById('fileSelector');
     domReferences.control.exportButton = document.getElementById('export');
     domReferences.control.edgeLocked = document.getElementById('edgeLocked');
+    domReferences.control.exportFileName = document.getElementById('exportFileName');
+
     domReferences.dropzone = document.getElementById('dropzone');
 
     const exportCanvas = document.createElement('canvas');

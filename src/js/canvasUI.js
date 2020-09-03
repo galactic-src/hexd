@@ -60,6 +60,13 @@ export const setupControls = () => {
     dom.control.xCentre.addEventListener('change', e => onXChanged(parseFloat(dom.control.xCentre.value)));
     dom.control.yCentre.addEventListener('change', e => onYChanged(parseFloat(dom.control.yCentre.value)));
     dom.control.edge.addEventListener('change', e => onEdgeChanged(parseFloat(dom.control.edge.value)));
+    dom.control.exportFileName.addEventListener('change', e => {
+        let enteredName = dom.control.exportFileName.value || 'hexport.png';
+        if (!enteredName.endsWith('.png')) {
+            enteredName += '.png';
+        }
+        dom.control.exportButton.download = enteredName;
+    });
 }
 
 const onXChanged = newXOffset => {

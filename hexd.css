@@ -1,0 +1,30 @@
+div#dropzone {
+    background-color: grey;
+    visibility: hidden;
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 2;
+}
+
+canvas#output {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 0;
+    cursor: none
+}
+
+canvas#background {
+    position: relative;
+    top: 0;
+    left: 0;
+    z-index: -1;
+    cursor: none
+}
+
+div#canvas-parent {
+    position: relative
+}
