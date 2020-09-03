@@ -34,26 +34,28 @@ export const setupCanvasUI = () => {
         onYChanged(state.scaleCentreY);
         setEdgeLength(newEdgeLength);
         onEdgeChanged(newEdgeLength);
+
+        drawHexOutline(dom.image.outputCanvas, state.scaleCentreX, state.scaleCentreY);
     })
 }
 
 const handleMouseInteraction = ({ clientX, clientY }, reposition) => {
     const { left, top } = dom.image.output.getBoundingClientRect();
-    const mouseX = clientX - left;
-    const mouseY = clientY - top;
+    state.currMouseX = clientX - left;
+    state.currMouseY = clientY - top;
 
     if (reposition) {
-        state.scaleCentreX = mouseX;
-        state.scaleCentreY = mouseY;
+        state.scaleCentreX = state.currMouseX;
+        state.scaleCentreY = state.currMouseY;
 
-        const { x, y } = adjustHexCentre(mouseX, mouseY, getEdgeLength(), getCanvasWidth(), getCanvasHeight());
+        const { x, y } = adjustHexCentre(state.scaleCentreX, state.scaleCentreY, getEdgeLength(), getCanvasWidth(), getCanvasHeight());
 
         setXOffset(x);
         setYOffset(y);
     }
 
     redraw();
-    drawHexOutline(dom.image.outputCanvas, mouseX, mouseY);
+    drawHexOutline(dom.image.outputCanvas, state.currMouseX, state.currMouseY);
 }
 
 export const setupControls = () => {
@@ -168,6 +170,12 @@ const onEdgeChanged = newEdge => {
         setYOffset(canvasHeight - hexHeight / 2);
     } else if (yOffset - hexHeight / 2 < 0) {
         setYOffset(hexHeight / 2)
+    }
+
+    if (cappedEdge === 0) {
+        dom.image.output.style.cursor = 'crosshair';
+    } else {
+        dom.image.output.style.cursor = 'none';
     }
 
     redraw();
