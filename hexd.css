@@ -27,6 +27,10 @@ div#side-panel input {
     width: 5rem;
 }
 
+div#side-panel input[type="checkbox"] {
+    width: auto;
+}
+
 div#side-panel input#fileSelector {
     width: 10rem;
 }
