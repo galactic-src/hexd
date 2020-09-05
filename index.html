@@ -5,19 +5,24 @@
 </head>
 
 <body>
+    <div id="header"></div>
     <div id="dropzone"></div>
-    <div><input type="file" id="fileSelector"></div>
-    <div>Center X: <input type="number" id="x" /></div>
-    <div>Center Y: <input type="number" id="y" /></div>
-    <div>Export as: <input id="exportFileName" type="text" placeholder="hexport.png" /></div>
-    <div>
-        Edge length: <input id="edge" type="number" /> Lock: <input id="edgeLocked" type="checkbox" />
-        <div id="canvas-parent">
-            <canvas id="output" height="0" width="0"></canvas>
-            <canvas id="background" height="0" width="0"></canvas>
-        </div>
+    <div id="side-panel">
+        <div><input type="file" id="fileSelector"></div>
+        <div>X: <input type="number" id="x" /></div>
+        <div>Y: <input type="number" id="y" /></div>
+        <div>Edge: <input id="edge" type="number" /></div>
+        <div>Width: <input id="outputWidth" type="number" /></div>
+        <div>Height: <input id="outputHeight" type="number" /></div>
+        <div>Lock: <input id="sizeLocked" type="checkbox" /></div>
+        <div>Export as: <input id="exportFileName" type="text" placeholder="hexport.png" /></div>
         <div><a id="export" download="hexport.png">Export</a></div>
-        <script src="./bundle.js"></script>
+    </div>
+    <div id="canvas-parent">
+        <canvas id="output" height="0" width="0"></canvas>
+        <canvas id="background" height="0" width="0"></canvas>
+    </div>
+    <script src="./bundle.js"></script>
 </body>
 
 </html>

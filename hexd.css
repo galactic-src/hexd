@@ -1,12 +1,42 @@
-div#dropzone {
-    background-color: grey;
-    visibility: hidden;
-    height: 100%;
+body {
+    padding: 0;
+    border: 0;
+    margin: 0;
+}
+
+div#header {
+    background-color: blue;
     width: 100%;
-    position: absolute;
+    height: 2rem;
     top: 0;
     left: 0;
-    z-index: 2;
+}
+
+div#side-panel {
+    position: absolute;
+    top: 2rem;
+    left: 0;
+    width: 10rem;
+    height: calc(100% - 2rem);
+    border-right-style: solid;
+    border-right-width: 2px;
+    border-right-color: black;
+}
+
+div#side-panel input {
+    width: 5rem;
+}
+
+div#side-panel input#fileSelector {
+    width: 10rem;
+}
+
+div#canvas-parent {
+    position: absolute;
+    top: 2rem;
+    left: 10rem;
+    width: calc(100% - 10rem);
+    height: calc(100% - 2rem);
 }
 
 canvas#output {
@@ -25,6 +55,13 @@ canvas#background {
     cursor: none
 }
 
-div#canvas-parent {
-    position: relative
+div#dropzone {
+    background-color: grey;
+    visibility: hidden;
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 2;
 }

@@ -2,6 +2,7 @@ export const SQRT3 = Math.sqrt(3);
 
 export const calcHexHeight = (edgeLength) => edgeLength * 2;
 export const calcHexWidth = (edgeLength) => edgeLength * SQRT3;
+export const rounded = (scalar) => Math.round(scalar * 100) / 100;
 
 export const adjustHexCentre = (x, y, edge, canvasWidth, canvasHeight) => {
     return {

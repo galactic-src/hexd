@@ -1,8 +1,10 @@
-import { getEdgeLength, setEdgeLength, getCanvasWidth, getCanvasHeight, setXOffset, getXOffset, setYOffset, getYOffset, getEdgeLocked } from './controls'
+import { getEdgeLength, setEdgeLength, getCanvasWidth, getCanvasHeight, setXOffset, getXOffset, setYOffset, getYOffset, getSizeLocked } from './controls'
 import dom from './dom'
 import { redraw, drawHexOutline } from './draw'
-import { SQRT3, adjustHexCentre, calcHexWidth, calcHexHeight } from './hex'
+import { SQRT3, adjustHexCentre, calcHexWidth, calcHexHeight, rounded } from './hex'
 import state from './state'
+
+const WHEEL_SCROLL_SCALE = 0.5
 
 export const setupCanvasUI = () => {
     document.body.addEventListener('mouseup', e => state.outputDrag = false);
@@ -19,11 +21,11 @@ export const setupCanvasUI = () => {
     dom.image.output.addEventListener('wheel', (e) => {
         e.preventDefault();
 
-        if (getEdgeLocked()) {
+        if (getSizeLocked()) {
             return;
         }
 
-        let newEdgeLength = getEdgeLength() + e.deltaY * 0.5;
+        let newEdgeLength = getEdgeLength() + e.deltaY * WHEEL_SCROLL_SCALE;
         if (newEdgeLength < 0) {
             newEdgeLength = 0;
         }
@@ -59,11 +61,14 @@ const handleMouseInteraction = ({ clientX, clientY }, reposition) => {
 }
 
 export const setupControls = () => {
-    dom.control.xCentre.addEventListener('change', e => onXChanged(parseFloat(dom.control.xCentre.value)));
-    dom.control.yCentre.addEventListener('change', e => onYChanged(parseFloat(dom.control.yCentre.value)));
-    dom.control.edge.addEventListener('change', e => onEdgeChanged(parseFloat(dom.control.edge.value)));
-    dom.control.exportFileName.addEventListener('change', e => {
-        let enteredName = dom.control.exportFileName.value || 'hexport.png';
+    const { xCentre, yCentre, edge, outputHeight, outputWidth, exportFileName } = dom.control;
+    xCentre.addEventListener('change', e => onXChanged(parseFloat(xCentre.value)));
+    yCentre.addEventListener('change', e => onYChanged(parseFloat(yCentre.value)));
+    edge.addEventListener('change', e => onEdgeChanged(parseFloat(edge.value)));
+    outputHeight.addEventListener('change', e => onOutputHeightChanged(parseFloat(outputHeight.value)));
+    outputWidth.addEventListener('change', e => onOutputWidthChanged(parseFloat(outputWidth.value)));
+    exportFileName.addEventListener('change', e => {
+        let enteredName = exportFileName.value || 'hexport.png';
         if (!enteredName.endsWith('.png')) {
             enteredName += '.png';
         }
@@ -75,7 +80,7 @@ const onXChanged = newXOffset => {
     const canvasWidth = getCanvasWidth();
     const edgeLength = getEdgeLength();
     const hexWidth = calcHexWidth(edgeLength);
-    const edgeLocked = getEdgeLocked();
+    const sizeLocked = getSizeLocked();
 
     if (newXOffset < 2) {
         newXOffset = 2;
@@ -88,13 +93,13 @@ const onXChanged = newXOffset => {
     const newHexRight = newXOffset + hexWidth / 2;
 
     if (newHexLeft < 0) {
-        if (edgeLocked) {
+        if (sizeLocked) {
             setXOffset(hexWidth / 2);
         } else {
             setEdgeLength(newXOffset / (SQRT3 / 2));
         }
     } else if (newHexRight > canvasWidth) {
-        if (edgeLocked) {
+        if (sizeLocked) {
             setXOffset(canvasWidth - hexWidth / 2);
         } else {
             setEdgeLength((canvasWidth - newXOffset) / (SQRT3 / 2));
@@ -108,7 +113,7 @@ const onYChanged = newYOffset => {
     const canvasHeight = getCanvasHeight();
     const edgeLength = getEdgeLength();
     const hexHeight = calcHexHeight(edgeLength);
-    const edgeLocked = getEdgeLocked();
+    const sizeLocked = getSizeLocked();
 
     if (newYOffset < 2) {
         newYOffset = 2;
@@ -121,13 +126,13 @@ const onYChanged = newYOffset => {
     const newHexBottom = newYOffset + hexHeight / 2;
 
     if (newHexTop < 0) {
-        if (edgeLocked) {
+        if (sizeLocked) {
             setYOffset(hexHeight / 2);
         } else {
             setEdgeLength(newYOffset);
         }
     } else if (newHexBottom > canvasHeight) {
-        if (edgeLocked) {
+        if (sizeLocked) {
             setYOffset(canvasHeight - hexHeight / 2)
         } else {
             setEdgeLength(canvasHeight - newYOffset);
@@ -152,7 +157,7 @@ const onEdgeChanged = newEdge => {
         cappedEdge = canvasWidth / SQRT3;
     }
 
-    if (cappedEdge !== newEdge) {
+    if (cappedEdge !== dom.control.edge) {
         setEdgeLength(cappedEdge);
     }
 
@@ -172,6 +177,9 @@ const onEdgeChanged = newEdge => {
         setYOffset(hexHeight / 2)
     }
 
+    dom.control.outputHeight.value = rounded(hexHeight);
+    dom.control.outputWidth.value = rounded(hexWidth);
+
     if (cappedEdge === 0) {
         dom.image.output.style.cursor = 'crosshair';
     } else {
@@ -179,4 +187,14 @@ const onEdgeChanged = newEdge => {
     }
 
     redraw();
+}
+
+const onOutputHeightChanged = newHeight => {
+    const newEdge = newHeight / 2;
+    onEdgeChanged(newEdge);
+}
+
+const onOutputWidthChanged = newHeight => {
+    const newEdge = newHeight / SQRT3;
+    onEdgeChanged(newEdge);
 }

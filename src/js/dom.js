@@ -12,7 +12,9 @@ const domReferences = {
         "xCentre": undefined,
         "yCentre": undefined,
         "edge": undefined,
-        "edgeLocked": undefined,
+        "outputWidth": undefined,
+        "outputHeight": undefined,
+        "sizeLocked": undefined,
         "fileSelector": undefined,
         "exportButton": undefined,
         "exportFileName": undefined,
@@ -32,9 +34,11 @@ export const initDom = () => {
     domReferences.control.xCentre = document.getElementById('x');
     domReferences.control.yCentre = document.getElementById('y');
     domReferences.control.edge = document.getElementById('edge');
+    domReferences.control.outputWidth = document.getElementById('outputWidth');
+    domReferences.control.outputHeight = document.getElementById('outputHeight');
     domReferences.control.fileSelector = document.getElementById('fileSelector');
     domReferences.control.exportButton = document.getElementById('export');
-    domReferences.control.edgeLocked = document.getElementById('edgeLocked');
+    domReferences.control.sizeLocked = document.getElementById('sizeLocked');
     domReferences.control.exportFileName = document.getElementById('exportFileName');
 
     domReferences.dropzone = document.getElementById('dropzone');

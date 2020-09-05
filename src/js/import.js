@@ -1,7 +1,7 @@
-import { setEdgeLength, setXOffset, setYOffset } from './controls'
+import { setEdgeLength, setXOffset, setYOffset, setOutputHeight, setOutputWidth } from './controls'
 import dom, { updateHiddenImageReference } from './dom'
 import { resetCtx, redraw } from './draw'
-import { SQRT3 } from './hex'
+import { SQRT3, calcHexHeight, calcHexWidth } from './hex'
 import state from './state'
 
 const onFileDropped = selectedFile => loadImage(selectedFile);
@@ -52,6 +52,9 @@ const setDefaultHex = ctx => {
     state.scaleCentreY = yOffset;
 
     setEdgeLength(edge);
+    setOutputHeight(calcHexHeight(edge));
+    setOutputWidth(calcHexWidth(edge));
+
     setXOffset(xOffset);
     setYOffset(yOffset);
 }
