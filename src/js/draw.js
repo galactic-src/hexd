@@ -17,6 +17,8 @@ export const redraw = () => {
         copyImageToCanvas(ctx);
         cropHex(ctx);
     }
+
+    refreshPreview();
 }
 
 const copyImageToCanvas = ctx => {
@@ -109,4 +111,36 @@ export const drawHexOutline = (ctx, initialX, initialY) => {
     ctx.lineTo(x, y - halfHexHeight);
     ctx.closePath();
     ctx.stroke();
+}
+
+const refreshPreview = () => {
+    clear(dom.image.previewCanvas);
+
+    if (getEdgeLength() > 0) {
+        drawPreview();
+    }
+}
+
+export const drawPreview = () => {
+    resetCtx(dom.image.previewCanvas);
+    const edge = getEdgeLength();
+
+    if (edge === 0) {
+        alert('hex too small');
+        return;
+    }
+
+    const hexWidth = calcHexWidth(edge);
+    const hexHeight = calcHexHeight(edge);
+
+    const xOffset = getXOffset();
+    const yOffset = getYOffset();
+
+    const x = xOffset - hexWidth / 2;
+    const y = yOffset - hexHeight / 2;
+
+    const { width, height } = dom.image.preview;
+
+    dom.image.previewCanvas
+        .drawImage(dom.image.output, x, y, hexWidth, hexHeight, 0, 0, width, height);
 }

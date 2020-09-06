@@ -69,3 +69,16 @@ div#dropzone {
     left: 0;
     z-index: 2;
 }
+
+a#export img {
+    display: inline-block;
+    padding: 0.2rem;
+    width: 1.5rem;
+    height: 1.5rem;
+}
+
+canvas#preview {
+    width: 10rem;
+    height: calc(10rem * 1.15470053838);
+    /* width * 2/sqrt(3) */
+}

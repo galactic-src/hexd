@@ -15,8 +15,14 @@
         <div>Width: <input id="outputWidth" type="number" /></div>
         <div>Height: <input id="outputHeight" type="number" /></div>
         <div>Lock: <input id="sizeLocked" type="checkbox" /></div>
-        <div>Export as: <input id="exportFileName" type="text" placeholder="hexport.png" /></div>
-        <div><a id="export" download="hexport.png">Export</a></div>
+        <div>
+            <input id="exportFileName" type="text" placeholder="hexport.png"></input>
+
+            <a id="export" download="hexport.png">
+                <img id='download-icon' src='./assets/download_icon.svg'></img>
+            </a>
+        </div>
+        <div><canvas id="preview"></canvas></div>
     </div>
     <div id="canvas-parent">
         <canvas id="output" height="0" width="0"></canvas>

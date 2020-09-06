@@ -7,6 +7,8 @@ const domReferences = {
         "hiddenImage": undefined,
         "export": undefined,
         "exportCanvas": undefined,
+        "preview": undefined,
+        "previewCanvas": undefined
     },
     "control": {
         "xCentre": undefined,
@@ -30,6 +32,10 @@ export const initDom = () => {
     const output = document.getElementById('output');
     domReferences.image.output = output;
     domReferences.image.outputCanvas = output.getContext("2d");
+
+    const preview = document.getElementById('preview');
+    domReferences.image.preview = preview;
+    domReferences.image.previewCanvas = preview.getContext("2d");
 
     domReferences.control.xCentre = document.getElementById('x');
     domReferences.control.yCentre = document.getElementById('y');
